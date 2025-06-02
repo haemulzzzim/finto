@@ -7,6 +7,9 @@ pipeline {
 
     stages {
         stage('Build & Deploy') {
+            when {
+                branch 'BE'  // 이 브랜치에서만 실행됨
+            }
             steps {
                 sh 'docker compose down'
                 sh 'docker compose up -d --build'
