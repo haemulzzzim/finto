@@ -24,7 +24,10 @@ services:
         networks:
             - internal
 
+#networks:
+#    default:
+#        external: true
+#        name: internal  # ✅ nginx와 공유되는 network
 networks:
-    default:
+    internal:
         external: true
-        name: internal  # ✅ nginx와 공유되는 network
