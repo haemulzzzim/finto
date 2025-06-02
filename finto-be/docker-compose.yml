@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+    app:
+        build: .
+        container_name: finto-app
+        restart: always
+        ports:
+            - "8090:8090"
+        environment:
+            # 외부 네트워크의 MySQL과 Redis에 접근하기 위해 호스트 IP 사용
+            - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/finto?useUnicode=true&characterEncoding=utf-8
+            - SPRING_DATASOURCE_USERNAME=${MYSQL_USER:-root}
+            - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+            - SPRING_DATA_REDIS_HOST=host.docker.internal
+            - SPRING_DATA_REDIS_PORT=6379
+            - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD}
+            - SPRING_PROFILES_ACTIVE=prod
+            - TZ=Asia/Seoul
+        extra_hosts:
+            - "host.docker.internal:host-gateway" # Linux에서 host.docker.internal을 사용하기 위한 설정
+        volumes:
+            - ./src/main/resources/application-secret.yml:/app/resources/application-secret.yml:ro
