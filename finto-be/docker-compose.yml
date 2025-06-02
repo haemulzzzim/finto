@@ -21,3 +21,9 @@ services:
             - "host.docker.internal:host-gateway" # Linux에서 host.docker.internal을 사용하기 위한 설정
         volumes:
             - ./src/main/resources/application-secret.yml:/app/resources/application-secret.yml:ro
+        networks:
+            - internal
+
+networks:
+    internal:
+        external: true
