@@ -11,12 +11,12 @@ pipeline {
         stage('Build & Deploy') {
             steps {
                 dir('finto-be') {
-                    sh '''
+                    sh """
                         MYSQL_USER=$MYSQL_USER \\
                         MYSQL_PASSWORD=$MYSQL_PASSWORD \\
                         REDIS_PASSWORD=$REDIS_PASSWORD \\
                         docker compose -f ./docker-compose.yml up -d --build --remove-orphans --force-recreate
-                    '''
+                    """
                 }
             }
         }
