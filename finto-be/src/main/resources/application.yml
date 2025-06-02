@@ -1,7 +1,7 @@
 server:
     # 효진 노트북 local 용
     port: 8090
-
+    forward-headers-strategy: native
     # develop 브랜치 용
     #  port: 8080
 
