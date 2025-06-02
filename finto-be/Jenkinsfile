@@ -1,28 +1,31 @@
 pipeline {
     agent any
 
-    triggers {
-        githubPush()
+    environment {
+        MYSQL_USER      = credentials('mysql-user')
+        MYSQL_PASSWORD  = credentials('mysql-pass')
+        REDIS_PASSWORD  = credentials('redis-pass')
     }
 
     stages {
         stage('Build & Deploy') {
-            when {
-                branch 'BE'  // 이 브랜치에서만 실행됨
-            }
             steps {
-                sh 'docker compose down'
-                sh 'docker compose up -d --build'
+                dir('finto-be') {
+                    sh '''
+                        docker compose down
+
+                        MYSQL_USER=$MYSQL_USER \\
+                        MYSQL_PASSWORD=$MYSQL_PASSWORD \\
+                        REDIS_PASSWORD=$REDIS_PASSWORD \\
+                        docker compose up -d --build
+                    '''
+                }
             }
         }
     }
 
     post {
-        success {
-            echo "✅ Build & deployment successful!"
-        }
-        failure {
-            echo "❌ Build failed. Check logs."
-        }
+        success { echo '✅ Deployment successful!' }
+        failure { echo '❌ Deployment failed.' }
     }
 }
