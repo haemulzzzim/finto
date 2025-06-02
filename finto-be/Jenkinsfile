@@ -1,0 +1,25 @@
+pipeline {
+    agent any
+
+    triggers {
+        githubPush()
+    }
+
+    stages {
+        stage('Build & Deploy') {
+            steps {
+                sh 'docker compose down'
+                sh 'docker compose up -d --build'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Build & deployment successful!"
+        }
+        failure {
+            echo "❌ Build failed. Check logs."
+        }
+    }
+}
