@@ -25,5 +25,6 @@ services:
             - internal
 
 networks:
-    internal:
+    default:
         external: true
+        name: internal  # ✅ nginx와 공유되는 network
