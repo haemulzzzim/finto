@@ -12,8 +12,6 @@ pipeline {
             steps {
                 dir('finto-be') {
                     sh '''
-                        docker compose down
-
                         MYSQL_USER=$MYSQL_USER \\
                         MYSQL_PASSWORD=$MYSQL_PASSWORD \\
                         REDIS_PASSWORD=$REDIS_PASSWORD \\
