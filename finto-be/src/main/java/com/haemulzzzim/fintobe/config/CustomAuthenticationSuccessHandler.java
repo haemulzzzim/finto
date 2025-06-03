@@ -2,6 +2,7 @@ package com.haemulzzzim.fintobe.config;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
@@ -10,6 +11,7 @@ import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,9 +22,22 @@ import lombok.extern.slf4j.Slf4j;
 public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final RequestCache requestCache = new HttpSessionRequestCache();
 
+    @Autowired
+    private AppConfig appConfig;
+
     public CustomAuthenticationSuccessHandler() {
-        // 기본 URL 설정
+        // 기본 URL 설정 (초기값)
         setDefaultTargetUrl("/home");
+    }
+
+    // 빈 초기화 후 설정값 적용
+    @PostConstruct
+    public void initTargetUrl() {
+        // 프록시 경로가 설정된 경우 기본 타겟 URL 업데이트
+        if (appConfig != null) {
+            setDefaultTargetUrl(appConfig.getProxyPath() + "/home");
+            log.info("기본 리다이렉트 URL이 {}로 설정되었습니다.", getDefaultTargetUrl());
+        }
     }
 
     @Override
@@ -59,5 +74,4 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
-
 }

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.haemulzzzim.fintobe.config.AppConfig;
 import com.haemulzzzim.fintobe.meeting_room.dto.MeetingRequestDto;
 import com.haemulzzzim.fintobe.meeting_room.dto.MeetingResponseDto;
 import com.haemulzzzim.fintobe.meeting_room.service.CustomUserDetails;
@@ -44,6 +45,7 @@ public class MeetingApiController {
     private static final Random random = new Random();
 
     private final MeetingService meetingService;
+    private final AppConfig appConfig;
 
     /**
      * 랜덤 Google Calendar ID를 생성합니다.
@@ -138,11 +140,11 @@ public class MeetingApiController {
             }
 
             // 성공 페이지로 리다이렉트
-            return "redirect:/page/meetings?tab=my";
+            return "redirect:" + appConfig.getProxyPath() + "/page/meetings?tab=my";
         } catch (Exception e) {
             log.error("예약 처리 중 오류 발생", e);
             redirectAttributes.addFlashAttribute("error", "예약 처리 중 오류가 발생했습니다: " + e.getMessage());
-            return "redirect:/page/meetings/reserve";
+            return "redirect:" + appConfig.getProxyPath() + "/page/meetings/reserve";
         }
     }
 
@@ -166,17 +168,17 @@ public class MeetingApiController {
             if (!meeting.getHostEmpSeq().equals(user.getUserSeq())) {
                 log.warn("예약 취소 권한 없음 - 본인: {}, 예약자: {}", user.getUserSeq(), meeting.getHostEmpSeq());
                 redirectAttributes.addFlashAttribute("error", "예약 취소 권한이 없습니다.");
-                return "redirect:/page/meetings?tab=my";
+                return "redirect:" + appConfig.getProxyPath() + "/page/meetings?tab=my";
             }
 
             // 예약 취소 처리
             meetingService.deleteMeeting(meetingId);
             redirectAttributes.addFlashAttribute("message", "예약이 성공적으로 취소되었습니다.");
-            return "redirect:/page/meetings?tab=my";
+            return "redirect:" + appConfig.getProxyPath() + "/page/meetings?tab=my";
         } catch (Exception e) {
             log.error("예약 삭제 중 오류 발생", e);
             redirectAttributes.addFlashAttribute("error", "예약 삭제 중 오류가 발생했습니다: " + e.getMessage());
-            return "redirect:/page/meetings?tab=my";
+            return "redirect:" + appConfig.getProxyPath() + "/page/meetings?tab=my";
         }
     }
 

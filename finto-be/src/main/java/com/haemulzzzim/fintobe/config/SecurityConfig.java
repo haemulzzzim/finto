@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
     private final CustomAuthenticationSuccessHandler authenticationSuccessHandler;
+    private final AppConfig appConfig;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -38,7 +39,7 @@ public class SecurityConfig {
                         .successHandler(authenticationSuccessHandler)
                         .permitAll())
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/login")
+                        .logoutSuccessUrl(appConfig.getProxyPath() + "/login")
                         .permitAll());
         // 필요에 따라 추가 설정 가능
         return http.build();

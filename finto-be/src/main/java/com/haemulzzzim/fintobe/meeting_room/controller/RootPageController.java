@@ -3,6 +3,8 @@ package com.haemulzzzim.fintobe.meeting_room.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.haemulzzzim.fintobe.config.AppConfig;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,17 +17,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RootPageController {
 
+    private final AppConfig appConfig;
+
     // 루트 페이지 리다이렉트
     @GetMapping("/")
     public String root() {
-        return "redirect:/page/users/home";
+        return "redirect:" + appConfig.getProxyPath() + "/page/users/home";
     }
 
     // 기존 로그아웃 URL에 대한 리다이렉트
     @GetMapping("/logout")
     public String logout() {
         // Spring Security의 로그아웃 처리를 사용
-        return "redirect:/page/users/login?logout";
+        return "redirect:" + appConfig.getProxyPath() + "/page/users/login?logout";
     }
 
     // 기존 로그인 URL에 대한 리다이렉트
@@ -37,28 +41,28 @@ public class RootPageController {
     // 기존 홈 URL에 대한 리다이렉트
     @GetMapping("/home")
     public String home() {
-        return "redirect:/page/users/home";
+        return "redirect:" + appConfig.getProxyPath() + "/page/users/home";
     }
 
     // 기존 사용자 관련 URL에 대한 리다이렉트
     @GetMapping("/user/form")
     public String userForm() {
-        return "redirect:/page/users/form";
+        return "redirect:" + appConfig.getProxyPath() + "/page/users/form";
     }
 
     @GetMapping("/user/list")
     public String userList() {
-        return "redirect:/page/users/list";
+        return "redirect:" + appConfig.getProxyPath() + "/page/users/list";
     }
 
     // 기존 회의실 예약 관련 URL에 대한 리다이렉트
     @GetMapping("/page/meeting")
     public String meeting() {
-        return "redirect:/page/meetings";
+        return "redirect:" + appConfig.getProxyPath() + "/page/meetings";
     }
 
     @GetMapping("/meetings/reserve")
     public String reserve() {
-        return "redirect:/page/rooms";
+        return "redirect:" + appConfig.getProxyPath() + "/page/rooms";
     }
 }

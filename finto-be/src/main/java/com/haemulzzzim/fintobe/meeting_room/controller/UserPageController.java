@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.haemulzzzim.fintobe.config.AppConfig;
 import com.haemulzzzim.fintobe.meeting_room.dto.UserDto;
 import com.haemulzzzim.fintobe.meeting_room.entity.Employee;
 import com.haemulzzzim.fintobe.meeting_room.service.CustomUserDetails;
@@ -33,9 +34,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class UserPageController {
-    private static final String REDIRECT_LOGIN_PATH = "redirect:/page/users/login";
+    private final String REDIRECT_LOGIN_PATH = "redirect:/page/users/login";
 
     private final UserService userService;
+    private final AppConfig appConfig;
 
     @GetMapping("/login")
     public String loginPage(Model model) {
@@ -115,7 +117,7 @@ public class UserPageController {
                 userService.update(empSeq, dto);
                 redirectAttributes.addFlashAttribute("message", "사용자 정보가 수정되었습니다.");
             }
-            return "redirect:/page/users/list";
+            return "redirect:" + appConfig.getProxyPath() + "/page/users/list";
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("empSeq", empSeq);
@@ -153,9 +155,10 @@ public class UserPageController {
         try {
             userService.delete(id);
             redirectAttributes.addFlashAttribute("message", "사용자가 삭제되었습니다.");
+            return "redirect:" + appConfig.getProxyPath() + "/page/users/list";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:" + appConfig.getProxyPath() + "/page/users/list";
         }
-        return "redirect:/page/users/list";
     }
 }

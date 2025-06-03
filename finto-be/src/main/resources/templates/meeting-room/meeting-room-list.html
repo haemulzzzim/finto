@@ -9,16 +9,16 @@
             rel="stylesheet"
         />
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-        <link rel="stylesheet" th:href="@{/css/style.css}" />
-        <link rel="stylesheet" th:href="@{/css/meeting-room-list.css}" />
+        <link rel="stylesheet" th:href="@{${proxyPath} + '/css/style.css'}" />
+        <link rel="stylesheet" th:href="@{${proxyPath} + '/css/meeting-room-list.css'}" />
     </head>
     <body>
         <header class="header">
             <div class="header-content">
                 <div class="header-title">회의실 예약 시스템</div>
                 <div class="nav">
-                    <a th:href="@{/page/meetings/reserve}">예약하기</a>
-                    <a th:href="@{/page/meetings}" class="active">예약 목록</a>
+                    <a th:href="@{${proxyPath} + '/page/meetings/reserve'}">예약하기</a>
+                    <a th:href="@{${proxyPath} + '/page/meetings'}" class="active">예약 목록</a>
                 </div>
             </div>
         </header>
@@ -85,13 +85,13 @@
                                 <td>
                                     <button
                                         class="action-btn view"
-                                        th:onclick="|location.href='@{/page/meetings/${reservation.meetingId}}'|"
+                                        th:onclick="|location.href='@{${proxyPath} + '/page/meetings/${reservation.meetingId}'}'|"
                                     >
                                         보기
                                     </button>
                                     <button
                                         class="action-btn edit"
-                                        th:onclick="|location.href='@{/page/meetings/reserve/${reservation.meetingId}}'|"
+                                        th:onclick="|location.href='@{${proxyPath} + '/page/meetings/reserve/${reservation.meetingId}'}'|"
                                     >
                                         수정
                                     </button>
@@ -118,7 +118,7 @@
                     <div class="pagination" th:if="${myTotalPages > 0}">
                         <span th:each="pageNumber : ${#numbers.sequence(1, myTotalPages)}">
                             <a
-                                th:href="@{/page/meetings(tab='my', page=${pageNumber - 1})}"
+                                th:href="@{${proxyPath} + '/page/meetings(tab=my, page=${pageNumber - 1})'}"
                                 th:text="${pageNumber}"
                                 th:class="${pageNumber == myPage} ? 'active' : ''"
                             >
@@ -172,7 +172,7 @@
                                 <td>
                                     <button
                                         class="action-btn view"
-                                        th:onclick="|location.href='@{/page/meetings/${reservation.meetingId}}'|"
+                                        th:onclick="|location.href='@{${proxyPath} + '/page/meetings/${reservation.meetingId}'}'|"
                                     >
                                         보기
                                     </button>
@@ -186,7 +186,7 @@
                     <div class="pagination" th:if="${allTotalPages > 0}">
                         <span th:each="pageNumber : ${#numbers.sequence(1, allTotalPages)}">
                             <a
-                                th:href="@{/page/meetings(tab='all', page=${pageNumber - 1})}"
+                                th:href="@{${proxyPath} + '/page/meetings(tab=all, page=${pageNumber - 1})'}"
                                 th:text="${pageNumber}"
                                 th:class="${pageNumber == allPage} ? 'active' : ''"
                             >
@@ -237,11 +237,14 @@
             </div>
         </main>
 
-        <script>
+        <script th:inline="javascript">
             // 현재 페이지 정보
             let currentTab = "my-reservations";
             let myPage = 1;
             let allPage = 1;
+
+            // proxyPath 가져오기
+            const proxyPath = /*[[${proxyPath}]]*/ "";
 
             // 날짜 포맷 함수
             function formatDate(dateStr) {
@@ -272,7 +275,7 @@
             // 내 예약 목록 로드
             function loadMyMeetingData(page = 0) {
                 showLoading();
-                fetch(`/api/meetings/my?page=${page}`)
+                fetch(`${proxyPath}/api/meetings/my?page=${page}`)
                     .then((response) => response.json())
                     .then((data) => {
                         // DOM 요소를 안전하게 선택
@@ -321,14 +324,12 @@
                                         <td>${reservation.roomName || ""}</td>
                                         <td><span class="badge confirmed">확정</span></td>
                                         <td>
-                                            <button class="action-btn view" onclick="location.href='/page/meetings/${
-                                                reservation.meetingId
-                                            }'">보기</button>
-                                            <button class="action-btn edit" onclick="location.href='/page/meetings/reserve/${
-                                                reservation.meetingId
-                                            }'" ${
-                                    isPast ? 'disabled title="지난 예약은 수정할 수 없습니다"' : ""
-                                }>수정</button>
+                                            <button class="action-btn view" onclick="location.href='${proxyPath}/page/meetings/${
+                                    reservation.meetingId
+                                }'">보기</button>
+                                            <button class="action-btn edit" onclick="location.href='${proxyPath}/page/meetings/reserve/${
+                                    reservation.meetingId
+                                }'" ${isPast ? 'disabled title="지난 예약은 수정할 수 없습니다"' : ""}>수정</button>
                                             <button type="button" class="action-btn delete" 
                                             ${isPast ? 'disabled title="지난 예약은 취소할 수 없습니다"' : ""}
                                             onclick="${
@@ -386,7 +387,7 @@
             // 전체 예약 목록 로드
             function loadAllMeetingData(page = 0) {
                 showLoading();
-                fetch(`/api/meetings?page=${page}`)
+                fetch(`${proxyPath}/api/meetings?page=${page}`)
                     .then((response) => response.json())
                     .then((data) => {
                         // DOM 요소를 안전하게 선택
@@ -422,9 +423,9 @@
                                         <td>${reservation.userName || ""}</td>
                                         <td><span class="badge confirmed">확정</span></td>
                                         <td>
-                                            <button class="action-btn view" onclick="location.href='/page/meetings/${
-                                                reservation.meetingId
-                                            }'">보기</button>
+                                            <button class="action-btn view" onclick="location.href='${proxyPath}/page/meetings/${
+                                    reservation.meetingId
+                                }'">보기</button>
                                         </td>
                                     </tr>
                                 `;
@@ -695,7 +696,7 @@
 
                 // 폼 action 설정
                 const cancelForm = document.getElementById("cancelForm");
-                cancelForm.action = `/api/meetings/${meetingId}`;
+                cancelForm.action = `${proxyPath}/api/meetings/${meetingId}`;
 
                 // 이벤트 기본 동작 방지를 위한 추가 조치
                 if (event) {
@@ -736,6 +737,11 @@
             // 오류 알림 함수
             function showErrorAlert(message) {
                 showAlert(message, "오류", false);
+            }
+
+            // JavaScript에서 경로 생성 시 proxyPath 사용
+            function buildPath(path) {
+                return `${proxyPath}${path}`;
             }
         </script>
     </body>

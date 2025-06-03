@@ -3,33 +3,24 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="UTF-8" />
-        <title>회의실 예약</title>
+        <title>회의실 예약하기</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Noto+Sans+KR:wght@400;700&display=swap"
-            rel="stylesheet"
-        />
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-        <!-- Air Datepicker CSS -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/air-datepicker@3.5.3/air-datepicker.min.css" />
-        <!-- Flatpickr CSS -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
-        <link rel="stylesheet" th:href="@{/css/style.css}" />
-        <link rel="stylesheet" th:href="@{/css/reserve-room.css}" />
+        <link rel="stylesheet" th:href="@{${proxyPath} + '/css/style.css'}" />
+        <link rel="stylesheet" th:href="@{${proxyPath} + '/css/reserve-room.css'}" />
     </head>
     <body>
         <div class="header" id="header">
             <div class="header-content">
                 <div class="header-title">회의실 예약 시스템</div>
                 <div class="nav">
-                    <a th:href="@{/page/meetings/reserve}" class="active">예약하기</a>
-                    <a th:href="@{/page/meetings}">예약 목록</a>
+                    <a th:href="@{${proxyPath} + '/page/meetings/reserve'}" class="active">예약하기</a>
+                    <a th:href="@{${proxyPath} + '/page/meetings'}">예약 목록</a>
                 </div>
             </div>
         </div>
         <div class="main">
             <!-- 예약 폼 -->
-            <form class="glass-card" th:action="@{/api/meetings/reserve}" method="post">
+            <form class="glass-card" th:action="@{${proxyPath} + '/api/meetings/reserve'}" method="post">
                 <h1 th:text="${isEdit} ? '회의실 예약 수정' : '회의실 예약'">회의실 예약</h1>
                 <!-- 수정 시 meetingId 필드 추가 -->
                 <input
