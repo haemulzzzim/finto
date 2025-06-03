@@ -196,6 +196,7 @@
         <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
         <script th:inline="javascript">
             // proxyPath 가져오기
+            const proxyPath = /*[[${proxyPath}]]*/ "";
             const frontProxyPath = /*[[${frontProxyPath}]]*/ "";
 
             // 한글 로케일 직접 설정
