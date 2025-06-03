@@ -9,16 +9,16 @@
             rel="stylesheet"
         />
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-        <link rel="stylesheet" th:href="@{${proxyPath} + '/css/style.css'}" />
-        <link rel="stylesheet" th:href="@{${proxyPath} + '/css/meeting-room-list.css'}" />
+        <link rel="stylesheet" th:href="@{${proxyPath + '/css/style.css'}}" />
+        <link rel="stylesheet" th:href="@{${proxyPath + '/css/meeting-room-list.css'}}" />
     </head>
     <body>
         <header class="header">
             <div class="header-content">
                 <div class="header-title">회의실 예약 시스템</div>
                 <div class="nav">
-                    <a th:href="@{${proxyPath} + '/page/meetings/reserve'}">예약하기</a>
-                    <a th:href="@{${proxyPath} + '/page/meetings'}" class="active">예약 목록</a>
+                    <a th:href="@{${proxyPath + '/page/meetings/reserve'}}">예약하기</a>
+                    <a th:href="@{${proxyPath + '/page/meetings'}}" class="active">예약 목록</a>
                 </div>
             </div>
         </header>
@@ -85,13 +85,13 @@
                                 <td>
                                     <button
                                         class="action-btn view"
-                                        th:onclick="|location.href='@{${proxyPath} + '/page/meetings/${reservation.meetingId}'}'|"
+                                        th:onclick="|location.href='@{${proxyPath + '/page/meetings/${reservation.meetingId}'}}'|"
                                     >
                                         보기
                                     </button>
                                     <button
                                         class="action-btn edit"
-                                        th:onclick="|location.href='@{${proxyPath} + '/page/meetings/reserve/${reservation.meetingId}'}'|"
+                                        th:onclick="|location.href='@{${proxyPath + '/page/meetings/reserve/${reservation.meetingId}'}}'|"
                                     >
                                         수정
                                     </button>
@@ -118,7 +118,7 @@
                     <div class="pagination" th:if="${myTotalPages > 0}">
                         <span th:each="pageNumber : ${#numbers.sequence(1, myTotalPages)}">
                             <a
-                                th:href="@{${proxyPath} + '/page/meetings(tab=my, page=${pageNumber - 1})'}"
+                                th:href="@{|${proxyPath}/page/meetings?tab=my&amp;page=${pageNumber - 1}|}"
                                 th:text="${pageNumber}"
                                 th:class="${pageNumber == myPage} ? 'active' : ''"
                             >
@@ -172,7 +172,7 @@
                                 <td>
                                     <button
                                         class="action-btn view"
-                                        th:onclick="|location.href='@{${proxyPath} + '/page/meetings/${reservation.meetingId}'}'|"
+                                        th:onclick="|location.href='@{${proxyPath + '/page/meetings/${reservation.meetingId}'}}'|"
                                     >
                                         보기
                                     </button>
@@ -186,7 +186,7 @@
                     <div class="pagination" th:if="${allTotalPages > 0}">
                         <span th:each="pageNumber : ${#numbers.sequence(1, allTotalPages)}">
                             <a
-                                th:href="@{${proxyPath} + '/page/meetings(tab=all, page=${pageNumber - 1})'}"
+                                th:href="@{|${proxyPath}/page/meetings?tab=all&amp;page=${pageNumber - 1}|}"
                                 th:text="${pageNumber}"
                                 th:class="${pageNumber == allPage} ? 'active' : ''"
                             >
