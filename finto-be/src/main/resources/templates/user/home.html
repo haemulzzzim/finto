@@ -110,7 +110,7 @@
             <h2>FINTO</h2>
             <div class="welcome">환영합니다! 👋</div>
             <div class="message" th:text="${message}"></div>
-            <form th:action="@{${proxyPath} + '/logout'}" method="post">
+            <form th:action="@{${frontProxyPath} + '/logout'}" method="post">
                 <button type="submit" class="btn-logout">
                     <span class="material-icons">logout</span>
                     로그아웃

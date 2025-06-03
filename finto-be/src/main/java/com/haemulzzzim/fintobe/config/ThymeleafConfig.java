@@ -22,10 +22,12 @@ public class ThymeleafConfig implements WebMvcConfigurer {
 		return new HandlerInterceptor() {
 			@Override
 			public boolean preHandle(jakarta.servlet.http.HttpServletRequest request,
-				jakarta.servlet.http.HttpServletResponse response,
-				Object handler) {
+					jakarta.servlet.http.HttpServletResponse response,
+					Object handler) {
 				// 모든 요청에 proxyPath를 추가
 				request.setAttribute("proxyPath", appConfig.getProxyPath());
+				// 프론트엔드 전용 경로 추가
+				request.setAttribute("frontProxyPath", appConfig.getFrontProxyPath());
 				return true;
 			}
 		};
