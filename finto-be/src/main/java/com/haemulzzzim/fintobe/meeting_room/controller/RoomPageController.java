@@ -25,24 +25,24 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RoomPageController {
 
-    private String REDIRECT_LOGIN_PATH;
-    private final RoomService roomService;
-    private final AppConfig appConfig;
+	private final RoomService roomService;
+	private final AppConfig appConfig;
+	private String REDIRECT_LOGIN_PATH;
 
-    @PostConstruct
-    public void init() {
-        REDIRECT_LOGIN_PATH = "redirect:" + appConfig.getProxyPath() + "/login";
-    }
+	@PostConstruct
+	public void init() {
+		REDIRECT_LOGIN_PATH = "redirect:" + appConfig.getProxyPath() + "/login";
+	}
 
-    /**
-     * 회의실 목록 페이지를 보여줍니다.
-     */
-    @GetMapping
-    public String showRoomListPage(Model model, @AuthenticationPrincipal CustomUserDetails user) {
-        if (user == null) {
-            return REDIRECT_LOGIN_PATH;
-        }
-        model.addAttribute("rooms", roomService.getAllRoomsWithTimeSlots(LocalDate.now()));
-        return "meeting-room/room-list";
-    }
+	/**
+	 * 회의실 목록 페이지를 보여줍니다.
+	 */
+	@GetMapping
+	public String showRoomListPage(Model model, @AuthenticationPrincipal CustomUserDetails user) {
+		if (user == null) {
+			return REDIRECT_LOGIN_PATH;
+		}
+		model.addAttribute("rooms", roomService.getAllRoomsWithTimeSlots(LocalDate.now()));
+		return "meeting-room/room-list";
+	}
 }
