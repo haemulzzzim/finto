@@ -244,7 +244,8 @@
             let allPage = 1;
 
             // proxyPath 가져오기
-            const proxyPath = /*[[${frontProxyPath}]]*/ "";
+            const proxyPath = /*[[${proxyPath}]]*/ "";
+            const frontProxyPath = /*[[${frontProxyPath}]]*/ "";
 
             // 날짜 포맷 함수
             function formatDate(dateStr) {
@@ -275,7 +276,7 @@
             // 내 예약 목록 로드
             function loadMyMeetingData(page = 0) {
                 showLoading();
-                fetch(`${proxyPath}/api/meetings/my?page=${page}`)
+                fetch(`${frontProxyPath}/api/meetings/my?page=${page}`)
                     .then((response) => response.json())
                     .then((data) => {
                         // DOM 요소를 안전하게 선택
@@ -696,7 +697,7 @@
 
                 // 폼 action 설정
                 const cancelForm = document.getElementById("cancelForm");
-                cancelForm.action = `${proxyPath}/api/meetings/${meetingId}`;
+                cancelForm.action = `${frontProxyPath}/api/meetings/${meetingId}`;
 
                 // 이벤트 기본 동작 방지를 위한 추가 조치
                 if (event) {
