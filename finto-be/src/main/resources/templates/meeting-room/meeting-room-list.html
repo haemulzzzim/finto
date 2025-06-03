@@ -85,13 +85,13 @@
                                 <td>
                                     <button
                                         class="action-btn view"
-                                        th:onclick="|location.href='@{${frontProxyPath} + '/page/meetings/${reservation.meetingId}'}'|"
+                                        th:onclick="|location.href='${frontProxyPath}/page/meetings/${reservation.meetingId}'|"
                                     >
                                         보기
                                     </button>
                                     <button
                                         class="action-btn edit"
-                                        th:onclick="|location.href='@{${frontProxyPath} + '/page/meetings/reserve/${reservation.meetingId}'}'|"
+                                        th:onclick="|location.href='${frontProxyPath}/page/meetings/reserve/${reservation.meetingId}'|"
                                     >
                                         수정
                                     </button>
@@ -172,7 +172,7 @@
                                 <td>
                                     <button
                                         class="action-btn view"
-                                        th:onclick="|location.href='@{${frontProxyPath} + '/page/meetings/${reservation.meetingId}'}'|"
+                                        th:onclick="|location.href='${frontProxyPath}/page/meetings/${reservation.meetingId}'|"
                                     >
                                         보기
                                     </button>
@@ -244,7 +244,6 @@
             let allPage = 1;
 
             // proxyPath 가져오기
-            const proxyPath = /*[[${proxyPath}]]*/ "";
             const frontProxyPath = /*[[${frontProxyPath}]]*/ "";
 
             // 날짜 포맷 함수
@@ -325,10 +324,10 @@
                                         <td>${reservation.roomName || ""}</td>
                                         <td><span class="badge confirmed">확정</span></td>
                                         <td>
-                                            <button class="action-btn view" onclick="location.href='${proxyPath}/page/meetings/${
+                                            <button class="action-btn view" onclick="location.href='${frontProxyPath}/page/meetings/${
                                     reservation.meetingId
                                 }'">보기</button>
-                                            <button class="action-btn edit" onclick="location.href='${proxyPath}/page/meetings/reserve/${
+                                            <button class="action-btn edit" onclick="location.href='${frontProxyPath}/page/meetings/reserve/${
                                     reservation.meetingId
                                 }'" ${isPast ? 'disabled title="지난 예약은 수정할 수 없습니다"' : ""}>수정</button>
                                             <button type="button" class="action-btn delete" 
@@ -388,7 +387,7 @@
             // 전체 예약 목록 로드
             function loadAllMeetingData(page = 0) {
                 showLoading();
-                fetch(`${proxyPath}/api/meetings?page=${page}`)
+                fetch(`${frontProxyPath}/api/meetings?page=${page}`)
                     .then((response) => response.json())
                     .then((data) => {
                         // DOM 요소를 안전하게 선택
@@ -424,7 +423,7 @@
                                         <td>${reservation.userName || ""}</td>
                                         <td><span class="badge confirmed">확정</span></td>
                                         <td>
-                                            <button class="action-btn view" onclick="location.href='${proxyPath}/page/meetings/${
+                                            <button class="action-btn view" onclick="location.href='${frontProxyPath}/page/meetings/${
                                     reservation.meetingId
                                 }'">보기</button>
                                         </td>

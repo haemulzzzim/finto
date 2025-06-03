@@ -192,10 +192,12 @@
         </div>
 
         <!-- JS CDN은 body 맨 아래에 위치 -->
-        <!-- JS CDN은 body 맨 아래에 위치 -->
         <script src="https://cdn.jsdelivr.net/npm/air-datepicker@3.5.3/air-datepicker.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-        <script>
+        <script th:inline="javascript">
+            // proxyPath 가져오기
+            const frontProxyPath = /*[[${frontProxyPath}]]*/ "";
+
             // 한글 로케일 직접 설정
             const airDatepickerLocaleKo = {
                 days: ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"],
@@ -359,7 +361,7 @@
                     roomSelectElem.appendChild(loadingOption);
 
                     // API 호출하여 가용 회의실 목록 가져오기
-                    const apiUrl = `/api/rooms/available?date=${date}&startTime=${startTime}&endTime=${endTime}&attendees=${attendees}`;
+                    const apiUrl = `${frontProxyPath}/api/rooms/available?date=${date}&startTime=${startTime}&endTime=${endTime}&attendees=${attendees}`;
                     console.log("API 요청 URL:", apiUrl);
 
                     fetch(apiUrl, {

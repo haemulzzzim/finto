@@ -194,7 +194,7 @@
 
         <script th:inline="javascript">
             // proxyPath 가져오기
-            const proxyPath = /*[[${frontProxyPath}]]*/ "";
+            const frontProxyPath = /*[[${frontProxyPath}]]*/ "";
 
             function goBack() {
                 window.history.back();
@@ -202,7 +202,7 @@
 
             function cancelMeeting(id) {
                 if (confirm("정말로 예약을 취소하시겠습니까?")) {
-                    fetch(`${proxyPath}/api/meetings/${id}`, {
+                    fetch(`${frontProxyPath}/api/meetings/${id}`, {
                         method: "DELETE",
                         headers: {
                             "Content-Type": "application/json",
@@ -216,7 +216,7 @@
                         })
                         .then((data) => {
                             alert("예약이 취소되었습니다.");
-                            window.location.href = `${proxyPath}/page/meetings?tab=my`;
+                            window.location.href = `${frontProxyPath}/page/meetings?tab=my`;
                         })
                         .catch((error) => {
                             alert(error.message);
