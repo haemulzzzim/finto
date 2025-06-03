@@ -30,6 +30,7 @@ import com.haemulzzzim.fintobe.meeting_room.service.MeetingService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import jakarta.annotation.PostConstruct;
 
 /**
  * 회의 예약 API 컨트롤러
@@ -39,13 +40,18 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class MeetingApiController {
-    private static final String REDIRECT_LOGIN_PATH = "redirect:/page/users/login";
+    private String REDIRECT_LOGIN_PATH;
     private static final String DEFAULT_MINUTE_PERIOD = "30";
     private static final String DEFAULT_GC_ID = "1234567890";
     private static final Random random = new Random();
 
     private final MeetingService meetingService;
     private final AppConfig appConfig;
+
+    @PostConstruct
+    public void init() {
+        REDIRECT_LOGIN_PATH = "redirect:" + appConfig.getProxyPath() + "/page/users/login";
+    }
 
     /**
      * 랜덤 Google Calendar ID를 생성합니다.
