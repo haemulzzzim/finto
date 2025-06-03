@@ -35,7 +35,7 @@ public class RootPageController {
     // 기존 로그인 URL에 대한 리다이렉트
     @GetMapping("/login")
     public String login() {
-        return "redirect:" + appConfig.getProxyPath() + "/page/users/login";
+        return "user/login-form";
     }
 
     // 기존 홈 URL에 대한 리다이렉트
