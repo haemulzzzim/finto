@@ -18,4 +18,11 @@ public class AppConfig {
      */
     @Value("${app.proxy.path:/}")
     private String proxyPath;
+
+    /**
+     * 프론트엔드에서 사용할 경로 접두사
+     * application.yml의 app.proxy.front-path에서 값을 가져옵니다.
+     */
+    @Value("${app.proxy.front-path:/service}")
+    private String frontProxyPath;
 }
