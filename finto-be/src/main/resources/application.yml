@@ -72,6 +72,12 @@ spring:
     thymeleaf:
         encoding: UTF-8
 
+# 애플리케이션 커스텀 설정
+app:
+    proxy:
+        # Nginx reverse proxy 경로 접두사
+        path: /service
+
 logging.level:
     #  org.apache: trace
     org.hibernate.SQL: debug
