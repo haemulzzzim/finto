@@ -5,22 +5,22 @@
         <meta charset="UTF-8" />
         <title>회의실 예약하기</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" th:href="@{${proxyPath} + '/css/style.css'}" />
-        <link rel="stylesheet" th:href="@{${proxyPath} + '/css/reserve-room.css'}" />
+        <link rel="stylesheet" th:href="@{${proxyPath + '/css/style.css'}}" />
+        <link rel="stylesheet" th:href="@{${proxyPath + '/css/reserve-room.css'}}" />
     </head>
     <body>
         <div class="header" id="header">
             <div class="header-content">
                 <div class="header-title">회의실 예약 시스템</div>
                 <div class="nav">
-                    <a th:href="@{${proxyPath} + '/page/meetings/reserve'}" class="active">예약하기</a>
-                    <a th:href="@{${proxyPath} + '/page/meetings'}">예약 목록</a>
+                    <a th:href="@{${proxyPath + '/page/meetings/reserve'}}" class="active">예약하기</a>
+                    <a th:href="@{${proxyPath + '/page/meetings'}}">예약 목록</a>
                 </div>
             </div>
         </div>
         <div class="main">
             <!-- 예약 폼 -->
-            <form class="glass-card" th:action="@{${proxyPath} + '/api/meetings/reserve'}" method="post">
+            <form class="glass-card" th:action="@{${proxyPath + '/api/meetings/reserve'}}" method="post">
                 <h1 th:text="${isEdit} ? '회의실 예약 수정' : '회의실 예약'">회의실 예약</h1>
                 <!-- 수정 시 meetingId 필드 추가 -->
                 <input
@@ -350,7 +350,7 @@
                     roomSelectElem.appendChild(loadingOption);
 
                     // API 호출하여 가용 회의실 목록 가져오기
-                    const apiUrl = `/api/rooms/available?date=${date}&startTime=${startTime}&endTime=${endTime}&attendees=${attendees}`;
+                    const apiUrl = `${proxyPath}/api/rooms/available?date=${date}&startTime=${startTime}&endTime=${endTime}&attendees=${attendees}`;
                     console.log("API 요청 URL:", apiUrl);
 
                     fetch(apiUrl, {

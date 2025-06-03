@@ -13,9 +13,13 @@
             <td th:text="${emp.empno}"></td>
             <td th:text="${emp.name}"></td>
             <td th:text="${emp.email}"></td>
-            <td><a th:href="@{'/page/users/form?id=' + ${emp.empSeq}}">수정</a></td>
+            <td><a th:href="@{${proxyPath + '/page/users/form?id=' + ${emp.empSeq}}}">수정</a></td>
             <td>
-                <form th:action="@{'/page/users/delete/' + ${emp.empSeq}}" method="post" style="margin: 0">
+                <form
+                    th:action="@{${proxyPath + '/page/users/delete/' + ${emp.empSeq}}}"
+                    method="post"
+                    style="margin: 0"
+                >
                     <button type="submit" class="btn-delete">삭제</button>
                 </form>
             </td>
