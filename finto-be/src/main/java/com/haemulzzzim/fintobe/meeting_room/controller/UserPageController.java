@@ -34,10 +34,17 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class UserPageController {
-    private final String REDIRECT_LOGIN_PATH = "redirect:/page/users/login";
+    // 리다이렉트 경로는 클래스 초기화 후 생성됩니다
+    private String REDIRECT_LOGIN_PATH;
 
     private final UserService userService;
     private final AppConfig appConfig;
+
+    // 생성자 이후 필드 초기화
+    @jakarta.annotation.PostConstruct
+    public void init() {
+        REDIRECT_LOGIN_PATH = "redirect:" + appConfig.getProxyPath() + "/page/users/login";
+    }
 
     @GetMapping("/login")
     public String loginPage(Model model) {

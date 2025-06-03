@@ -18,7 +18,9 @@ import com.haemulzzzim.fintobe.meeting_room.service.CustomUserDetails;
 import com.haemulzzzim.fintobe.meeting_room.service.MeetingService;
 import com.haemulzzzim.fintobe.meeting_room.service.RoomService;
 import com.haemulzzzim.fintobe.meeting_room.service.RoomTimeSlotService;
+import com.haemulzzzim.fintobe.config.AppConfig;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,10 +33,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class MeetingPageController {
-    // 상수 정의
-    private static final String REDIRECT_RESERVE_PATH = "redirect:/page/meetings/reserve";
-    private static final String REDIRECT_MY_MEETINGS_PATH = "redirect:/page/meetings?tab=my";
-    private static final String REDIRECT_LOGIN_PATH = "redirect:/page/users/login";
+    // 상수 정의 - 초기화는 init() 메소드에서 수행
+    private String REDIRECT_RESERVE_PATH;
+    private String REDIRECT_MY_MEETINGS_PATH;
+    private String REDIRECT_LOGIN_PATH;
     private static final String MEETING_ROOM_RESERVE_VIEW = "meeting-room/reserve-room";
     private static final String MEETING_ROOM_LIST_VIEW = "meeting-room/meeting-room-list";
     private static final String DEFAULT_MINUTE_PERIOD = "30";
@@ -44,6 +46,14 @@ public class MeetingPageController {
     private final MeetingService meetingService;
     private final RoomService roomService;
     private final RoomTimeSlotService roomTimeSlotService;
+    private final AppConfig appConfig;
+
+    @PostConstruct
+    public void init() {
+        REDIRECT_RESERVE_PATH = "redirect:" + appConfig.getProxyPath() + "/page/meetings/reserve";
+        REDIRECT_MY_MEETINGS_PATH = "redirect:" + appConfig.getProxyPath() + "/page/meetings?tab=my";
+        REDIRECT_LOGIN_PATH = "redirect:" + appConfig.getProxyPath() + "/page/users/login";
+    }
 
     /**
      * 회의실 예약 페이지를 보여줍니다.
@@ -53,7 +63,8 @@ public class MeetingPageController {
         if (user == null) {
             return REDIRECT_LOGIN_PATH;
         }
-        // model.addAttribute("rooms", roomService.getAllRoomsWithTimeSlots(LocalDate.now()));
+        // model.addAttribute("rooms",
+        // roomService.getAllRoomsWithTimeSlots(LocalDate.now()));
         // model.addAttribute("meeting", null); // 신규 예약이므로 빈 객체 전달
         return MEETING_ROOM_RESERVE_VIEW;
     }

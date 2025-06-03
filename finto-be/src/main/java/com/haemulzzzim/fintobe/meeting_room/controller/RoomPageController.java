@@ -8,9 +8,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.haemulzzzim.fintobe.config.AppConfig;
 import com.haemulzzzim.fintobe.meeting_room.service.CustomUserDetails;
 import com.haemulzzzim.fintobe.meeting_room.service.RoomService;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,8 +25,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RoomPageController {
 
-    private static final String REDIRECT_LOGIN_PATH = "redirect:/login";
+    private String REDIRECT_LOGIN_PATH;
     private final RoomService roomService;
+    private final AppConfig appConfig;
+
+    @PostConstruct
+    public void init() {
+        REDIRECT_LOGIN_PATH = "redirect:" + appConfig.getProxyPath() + "/login";
+    }
 
     /**
      * 회의실 목록 페이지를 보여줍니다.
