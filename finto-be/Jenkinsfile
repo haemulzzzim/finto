@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+
+    environment {
+        MYSQL_USER      = credentials('mysql-user')
+        MYSQL_PASSWORD  = credentials('mysql-pass')
+        REDIS_PASSWORD  = credentials('redis-pass')
+    }
+
+    stages {
+        stage('Build & Deploy') {
+            steps {
+                dir('finto-be') {
+                    sh """
+                        MYSQL_USER=$MYSQL_USER \\
+                        MYSQL_PASSWORD=$MYSQL_PASSWORD \\
+                        REDIS_PASSWORD=$REDIS_PASSWORD \\
+                        docker compose -f ./docker-compose.yml up -d --build --remove-orphans --force-recreate
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        success { echo '✅ Deployment successful!' }
+        failure { echo '❌ Deployment failed.' }
+    }
+}

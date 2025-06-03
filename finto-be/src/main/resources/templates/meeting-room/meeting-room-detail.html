@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>회의실 예약 상세</title>
+        <style>
+            body {
+                background: #f7f7f7;
+                font-family: "Noto Sans KR", sans-serif;
+            }
+            .container {
+                max-width: 800px;
+                margin: 40px auto;
+                background: #fff;
+                border-radius: 12px;
+                padding: 40px 32px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            }
+            h1 {
+                font-size: 2.2rem;
+                font-weight: bold;
+                margin-bottom: 32px;
+                color: #333;
+            }
+            .detail-section {
+                margin-bottom: 32px;
+            }
+            .detail-row {
+                display: flex;
+                margin-bottom: 16px;
+                border-bottom: 1px solid #f5f5f5;
+                padding-bottom: 16px;
+            }
+            .detail-label {
+                width: 30%;
+                font-weight: 600;
+                color: #555;
+            }
+            .detail-value {
+                width: 70%;
+                color: #333;
+            }
+            .badge {
+                padding: 4px 14px;
+                border-radius: 12px;
+                font-size: 0.95em;
+                font-weight: 500;
+                display: inline-block;
+            }
+            .badge.confirmed {
+                background: #e3f8e6;
+                color: #2bb673;
+            }
+            .badge.waiting {
+                background: #fff7e0;
+                color: #f7b500;
+            }
+            .buttons {
+                display: flex;
+                justify-content: flex-end;
+                margin-top: 32px;
+            }
+            .btn {
+                padding: 10px 24px;
+                border: none;
+                border-radius: 8px;
+                font-size: 1rem;
+                font-weight: 500;
+                cursor: pointer;
+                margin-left: 12px;
+                transition: all 0.2s;
+            }
+            .btn-primary {
+                background: #2d6cdf;
+                color: #fff;
+            }
+            .btn-primary:hover {
+                background: #1d5bce;
+            }
+            .btn-secondary {
+                background: #e9ecef;
+                color: #333;
+            }
+            .btn-secondary:hover {
+                background: #dde2e6;
+            }
+            .btn-danger {
+                background: #ff5a5a;
+                color: #fff;
+            }
+            .btn-danger:hover {
+                background: #e04949;
+            }
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 32px;
+            }
+            .header-title {
+                font-size: 1.3rem;
+                font-weight: bold;
+            }
+            .nav {
+                font-size: 1.1rem;
+            }
+            .nav a {
+                margin-left: 24px;
+                text-decoration: none;
+                color: #2d6cdf;
+                font-weight: bold;
+            }
+            .nav a.active {
+                color: #222;
+                border-bottom: 2px solid #2d6cdf;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header" style="background: #fff; padding: 18px 40px 18px 40px; border-bottom: 1px solid #eee">
+            <div class="header-title">회의실 예약 시스템</div>
+            <div class="nav">
+                <a th:href="@{${frontProxyPath} + '/page/meetings/reserve'}">예약하기</a>
+                <a th:href="@{${frontProxyPath} + '/page/meetings'}" class="active">예약 목록</a>
+            </div>
+        </div>
+
+        <div class="container">
+            <h1>회의실 예약 상세</h1>
+
+            <div class="detail-section">
+                <div class="detail-row">
+                    <div class="detail-label">회의명</div>
+                    <div class="detail-value" th:text="${meeting.title}">투자팀 주간 회의</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">회의실</div>
+                    <div class="detail-value" th:text="${meeting.roomName}">회의실 A</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">날짜</div>
+                    <div class="detail-value" th:text="${#temporals.format(meeting.date, 'yyyy년 M월 d일')}">
+                        2025년 5월 1일
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">시간</div>
+                    <div class="detail-value">
+                        <span th:text="${#temporals.format(meeting.startTime, 'HH:mm')}">14:00</span>
+                        -
+                        <span th:text="${#temporals.format(meeting.endTime, 'HH:mm')}">15:00</span>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">예약자</div>
+                    <div class="detail-value" th:text="${meeting.hostName}">홍길동</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">상태</div>
+                    <div class="detail-value">
+                        <span class="badge confirmed">확정</span>
+                    </div>
+                </div>
+                <div class="detail-row" th:if="${meeting.participants != null && !meeting.participants.isEmpty()}">
+                    <div class="detail-label">참석자</div>
+                    <div class="detail-value">
+                        <div
+                            th:each="participant : ${meeting.participants}"
+                            th:text="${participant.name} + ' (' + ${participant.email} + ')'"
+                        >
+                            김철수 (chulsoo@example.com)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="buttons">
+                <button class="btn btn-secondary" onclick="goBack()">뒤로가기</button>
+                <a
+                    th:if="${meeting.hostEmpSeq == #authentication.principal.userSeq}"
+                    th:href="@{${frontProxyPath} + '/page/meetings/reserve/' + ${meeting.meetingId}}"
+                    class="btn btn-primary"
+                    >수정하기</a
+                >
+                <button
+                    th:if="${meeting.hostEmpSeq == #authentication.principal.userSeq}"
+                    class="btn btn-danger"
+                    th:onclick="|cancelMeeting(${meeting.meetingId})|"
+                >
+                    취소하기
+                </button>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            // proxyPath 가져오기
+            const frontProxyPath = /*[[${frontProxyPath}]]*/ "";
+
+            function goBack() {
+                window.history.back();
+            }
+
+            function cancelMeeting(id) {
+                if (confirm("정말로 예약을 취소하시겠습니까?")) {
+                    fetch(`${frontProxyPath}/api/meetings/${id}`, {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    })
+                        .then((response) => {
+                            if (!response.ok) {
+                                throw new Error("예약 취소에 실패했습니다.");
+                            }
+                            return response.text();
+                        })
+                        .then((data) => {
+                            alert("예약이 취소되었습니다.");
+                            window.location.href = `${frontProxyPath}/page/meetings?tab=my`;
+                        })
+                        .catch((error) => {
+                            alert(error.message);
+                        });
+                }
+            }
+        </script>
+    </body>
+</html>

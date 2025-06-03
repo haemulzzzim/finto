@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>메인 페이지</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Noto+Sans+KR:wght@400;700&display=swap"
+            rel="stylesheet"
+        />
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+        <style>
+            body {
+                min-height: 100vh;
+                margin: 0;
+                background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: "Montserrat", "Noto Sans KR", sans-serif;
+                overflow-x: hidden;
+            }
+            .glass-card {
+                width: 100%;
+                max-width: 430px;
+                background: rgba(255, 255, 255, 0.25);
+                border-radius: 22px;
+                box-shadow: 0 8px 32px rgba(60, 60, 120, 0.18);
+                padding: 48px 32px 36px 32px;
+                display: flex;
+                flex-direction: column;
+                gap: 28px;
+                backdrop-filter: blur(16px) saturate(180%);
+                border: 1.5px solid rgba(255, 255, 255, 0.35);
+                animation: fadeIn 0.8s cubic-bezier(0.39, 0.575, 0.56, 1);
+                box-sizing: border-box;
+            }
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            .glass-card h2 {
+                margin: 0 0 10px 0;
+                text-align: center;
+                font-weight: 700;
+                font-size: 2.1rem;
+                color: #2d8cf0;
+                letter-spacing: -1px;
+                text-shadow: 0 2px 8px rgba(45, 140, 240, 0.08);
+            }
+            .welcome {
+                text-align: center;
+                font-size: 1.15rem;
+                color: #333;
+                font-weight: 500;
+                margin-bottom: 8px;
+                letter-spacing: -0.5px;
+            }
+            .message {
+                text-align: center;
+                font-size: 1.05rem;
+                color: #6e8efb;
+                font-weight: 600;
+                margin-bottom: 18px;
+            }
+            .btn-logout {
+                width: 100%;
+                padding: 13px;
+                background: linear-gradient(90deg, #ff5858 0%, #f09819 100%);
+                color: #fff;
+                border: none;
+                border-radius: 10px;
+                font-size: 1.08rem;
+                font-weight: 700;
+                cursor: pointer;
+                box-shadow: 0 2px 12px rgba(255, 88, 88, 0.1);
+                transition: background 0.2s, transform 0.1s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+            .btn-logout:hover {
+                background: linear-gradient(90deg, #f09819 0%, #ff5858 100%);
+                transform: translateY(-2px) scale(1.03);
+            }
+            .material-icons {
+                font-size: 1.2rem;
+                vertical-align: middle;
+            }
+            @media (max-width: 500px) {
+                .glass-card {
+                    padding: 24px 8px 18px 8px;
+                    max-width: 97vw;
+                }
+                .glass-card h2 {
+                    font-size: 1.3rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="glass-card">
+            <h2>FINTO</h2>
+            <div class="welcome">환영합니다! 👋</div>
+            <div class="message" th:text="${message}"></div>
+            <form th:action="@{${frontProxyPath} + '/logout'}" method="post">
+                <button type="submit" class="btn-logout">
+                    <span class="material-icons">logout</span>
+                    로그아웃
+                </button>
+            </form>
+        </div>
+    </body>
+</html>

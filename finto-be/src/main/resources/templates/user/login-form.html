@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>로그인</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Noto+Sans+KR:wght@400;700&display=swap"
+            rel="stylesheet"
+        />
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+        <style>
+            body {
+                min-height: 100vh;
+                margin: 0;
+                background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: "Montserrat", "Noto Sans KR", sans-serif;
+                overflow-x: hidden;
+            }
+            .glass-card {
+                width: 100%;
+                max-width: 410px;
+                background: rgba(255, 255, 255, 0.25);
+                border-radius: 22px;
+                box-shadow: 0 8px 32px rgba(60, 60, 120, 0.18);
+                padding: 48px 32px 36px 32px;
+                display: flex;
+                flex-direction: column;
+                gap: 22px;
+                backdrop-filter: blur(16px) saturate(180%);
+                border: 1.5px solid rgba(255, 255, 255, 0.35);
+                animation: fadeIn 0.8s cubic-bezier(0.39, 0.575, 0.56, 1);
+                box-sizing: border-box;
+            }
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            .glass-card h2 {
+                margin: 0 0 18px 0;
+                text-align: center;
+                font-weight: 700;
+                font-size: 2.1rem;
+                color: #2d8cf0;
+                letter-spacing: -1px;
+                text-shadow: 0 2px 8px rgba(45, 140, 240, 0.08);
+            }
+            .form-group {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                position: relative;
+            }
+            label {
+                font-size: 1rem;
+                color: #333;
+                font-weight: 600;
+                margin-left: 2px;
+            }
+            .input-wrapper {
+                position: relative;
+                display: flex;
+                align-items: center;
+            }
+            .input-wrapper .material-icons {
+                position: absolute;
+                left: 14px;
+                color: #b0b8d1;
+                font-size: 1.3rem;
+                pointer-events: none;
+                transition: color 0.2s;
+            }
+            input[type="email"],
+            input[type="password"] {
+                width: 100%;
+                min-width: 0;
+                max-width: 100%;
+                box-sizing: border-box;
+                padding: 12px 14px 12px 40px;
+                border: 1.5px solid #e0e7ff;
+                border-radius: 10px;
+                font-size: 1.05rem;
+                background: rgba(248, 250, 255, 0.85);
+                transition: border 0.2s, background 0.2s;
+                font-family: inherit;
+            }
+            input[type="email"]:focus,
+            input[type="password"]:focus {
+                border: 1.5px solid #2d8cf0;
+                outline: none;
+                background: #fff;
+            }
+            input[type="email"]:focus ~ .material-icons,
+            input[type="password"]:focus ~ .material-icons {
+                color: #2d8cf0;
+            }
+            .btn-login {
+                width: 100%;
+                padding: 13px;
+                background: linear-gradient(90deg, #2d8cf0 0%, #6e8efb 100%);
+                color: #fff;
+                border: none;
+                border-radius: 10px;
+                font-size: 1.15rem;
+                font-weight: 700;
+                cursor: pointer;
+                box-shadow: 0 2px 12px rgba(45, 140, 240, 0.1);
+                transition: background 0.2s, transform 0.1s;
+                margin-top: 8px;
+            }
+            .btn-login:hover {
+                background: linear-gradient(90deg, #6e8efb 0%, #2d8cf0 100%);
+                transform: translateY(-2px) scale(1.03);
+            }
+            .error-msg {
+                color: #e74c3c;
+                text-align: center;
+                margin-bottom: 8px;
+                font-weight: 600;
+                font-size: 1rem;
+                letter-spacing: -0.5px;
+            }
+            .sub-link {
+                text-align: center;
+                margin-top: 10px;
+                color: #7b8bb7;
+                font-size: 0.98rem;
+            }
+            .sub-link a {
+                color: #2d8cf0;
+                text-decoration: none;
+                font-weight: 600;
+                transition: color 0.2s;
+            }
+            .sub-link a:hover {
+                color: #6e8efb;
+            }
+            @media (max-width: 500px) {
+                .glass-card {
+                    padding: 24px 8px 18px 8px;
+                    max-width: 97vw;
+                }
+                .glass-card h2 {
+                    font-size: 1.3rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="glass-card">
+            <h2>로그인</h2>
+            <form th:action="@{${frontProxyPath} + '/login'}" method="post" autocomplete="on">
+                <div th:if="${error}" class="error-msg" th:text="${error}"></div>
+                <div class="form-group">
+                    <label for="email">이메일</label>
+                    <div class="input-wrapper">
+                        <span class="material-icons">mail_outline</span>
+                        <input type="email" id="email" name="email" required autofocus autocomplete="username" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">비밀번호</label>
+                    <div class="input-wrapper">
+                        <span class="material-icons">lock_outline</span>
+                        <input type="password" id="password" name="password" required autocomplete="current-password" />
+                    </div>
+                </div>
+                <button type="submit" class="btn-login">로그인</button>
+            </form>
+            <div class="sub-link">비밀번호를 잊으셨나요? <a href="#">비밀번호 찾기</a></div>
+        </div>
+    </body>
+</html>

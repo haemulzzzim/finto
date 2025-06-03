@@ -1,0 +1,28 @@
+<table>
+    <thead>
+        <tr>
+            <th>사번</th>
+            <th>이름</th>
+            <th>이메일</th>
+            <th>수정</th>
+            <th>삭제</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="emp : ${employees}">
+            <td th:text="${emp.empno}"></td>
+            <td th:text="${emp.name}"></td>
+            <td th:text="${emp.email}"></td>
+            <td><a th:href="@{${frontProxyPath} + '/page/users/form?id=' + ${emp.empSeq}}">수정</a></td>
+            <td>
+                <form
+                    method="post"
+                    style="margin: 0"
+                    th:action="@{${frontProxyPath} + '/page/users/delete/' + ${emp.empSeq}}"
+                >
+                    <button class="btn-delete" type="submit">삭제</button>
+                </form>
+            </td>
+        </tr>
+    </tbody>
+</table>

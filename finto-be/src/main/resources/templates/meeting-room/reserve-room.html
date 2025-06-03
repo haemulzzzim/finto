@@ -1,0 +1,1767 @@
+<!-- reserve-room.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>회의실 예약</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Noto+Sans+KR:wght@400;700&display=swap"
+            rel="stylesheet"
+        />
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+        <!-- Air Datepicker CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/air-datepicker@3.5.3/air-datepicker.min.css" />
+        <!-- Flatpickr CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+        <link rel="stylesheet" th:href="@{${proxyPath} + '/css/style.css'}" />
+        <link rel="stylesheet" th:href="@{${proxyPath} + '/css/reserve-room.css'}" />
+    </head>
+    <body>
+        <div class="header" id="header">
+            <div class="header-content">
+                <div class="header-title">회의실 예약 시스템</div>
+                <div class="nav">
+                    <a th:href="@{${proxyPath} + '/page/meetings/reserve'}" class="active">예약하기</a>
+                    <a th:href="@{${proxyPath} + '/page/meetings'}">예약 목록</a>
+                </div>
+            </div>
+        </div>
+        <div class="main">
+            <!-- 예약 폼 -->
+            <form class="glass-card" th:action="@{${frontProxyPath} + '/api/meetings/reserve'}" method="post">
+                <h1 th:text="${isEdit} ? '회의실 예약 수정' : '회의실 예약'">회의실 예약</h1>
+                <!-- 수정 시 meetingId 필드 추가 -->
+                <input
+                    type="hidden"
+                    id="meetingId"
+                    name="meetingId"
+                    th:if="${isEdit}"
+                    th:value="${meeting.meetingId}"
+                />
+                <div class="form-group">
+                    <label class="form-label" for="title">회의 제목</label>
+                    <div class="input-wrapper">
+                        <span class="material-icons">edit</span>
+                        <input
+                            class="form-input"
+                            id="title"
+                            type="text"
+                            name="title"
+                            placeholder="예: 투자팀 주간 회의"
+                            th:value="${meeting?.title}"
+                            required
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="date">날짜</label>
+                    <div class="input-wrapper">
+                        <span class="material-icons">event</span>
+                        <input
+                            class="form-input air-datepicker-date"
+                            id="date"
+                            type="text"
+                            name="date"
+                            th:value="${meeting?.date}"
+                            placeholder="날짜 선택"
+                            required
+                            autocomplete="off"
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">시간</label>
+                    <div class="time-row">
+                        <!-- 시작 시간 -->
+                        <div class="custom-dropdown" id="startHourDropdown">
+                            <div class="dropdown-selected" id="startHourSelected"></div>
+                            <div class="dropdown-list" id="startHourList"></div>
+                        </div>
+                        <span class="custom-time-sep">:</span>
+                        <div class="custom-dropdown" id="startMinuteDropdown">
+                            <div class="dropdown-selected" id="startMinuteSelected"></div>
+                            <div class="dropdown-list" id="startMinuteList"></div>
+                        </div>
+                        <span class="time-sep">~</span>
+                        <!-- 종료 시간 -->
+                        <div class="custom-dropdown end-time-dropdown" id="endHourDropdown">
+                            <div class="dropdown-selected" id="endHourSelected"></div>
+                            <div class="dropdown-list" id="endHourList"></div>
+                        </div>
+                        <span class="custom-time-sep">:</span>
+                        <div class="custom-dropdown end-time-dropdown" id="endMinuteDropdown">
+                            <div class="dropdown-selected" id="endMinuteSelected"></div>
+                            <div class="dropdown-list" id="endMinuteList"></div>
+                        </div>
+                        <input type="hidden" id="startTime" name="startTime" th:value="${meeting?.startTime}" />
+                        <input type="hidden" id="endTime" name="endTime" th:value="${meeting?.endTime}" />
+                        <!-- 디버깅용 숨김 필드 -->
+                        <input
+                            type="hidden"
+                            id="hiddenStartTimeDebug"
+                            th:if="${meeting != null}"
+                            th:value="${meeting.startTime}"
+                        />
+                        <input
+                            type="hidden"
+                            id="hiddenEndTimeDebug"
+                            th:if="${meeting != null}"
+                            th:value="${meeting.endTime}"
+                        />
+                        <!-- Thymeleaf 형식 변환 추가 -->
+                        <input
+                            type="hidden"
+                            id="formattedStartTime"
+                            th:if="${meeting != null && meeting.startTime != null}"
+                            th:value="${#temporals.format(meeting.startTime, 'HH:mm')}"
+                        />
+                        <input
+                            type="hidden"
+                            id="formattedEndTime"
+                            th:if="${meeting != null && meeting.endTime != null}"
+                            th:value="${#temporals.format(meeting.endTime, 'HH:mm')}"
+                        />
+                    </div>
+                </div>
+
+                <!-- 기존 코드에서 참석자와 회의실 선택 순서 변경 -->
+                <div class="form-group">
+                    <label class="form-label" for="attendees">참석자</label>
+                    <div class="input-wrapper">
+                        <span class="material-icons">group</span>
+                        <input
+                            class="form-input"
+                            id="attendees"
+                            type="text"
+                            name="attendees"
+                            placeholder="예약자를 포함한 모든 참석자의 이메일을 쉼표로 구분하여 입력하세요"
+                            th:value="${attendees}"
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="roomId">회의실 선택</label>
+                    <div class="input-wrapper">
+                        <span class="material-icons">meeting_room</span>
+                        <select class="form-select" id="roomId" name="roomId" required>
+                            <option value="" selected disabled>날짜와 시간을 먼저 선택해주세요</option>
+                            <option
+                                th:each="room : ${rooms}"
+                                th:value="${room.roomId}"
+                                th:text="${room.name + ' (' + room.capacity + '인실)'}"
+                                th:selected="${meeting != null && meeting.roomId == room.roomId}"
+                            ></option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="form-btn" type="submit">
+                    <span class="material-icons">event_available</span>
+                    <span th:text="${isEdit} ? '수정하기' : '예약하기'">예약하기</span>
+                </button>
+            </form>
+            <!-- 회의실 목록/슬롯 -->
+            <div class="glass-card" style="max-width: 480px; min-width: 260px">
+                <div class="room-list-title">회의실 목록</div>
+                <div id="roomList">
+                    <div class="empty-message">
+                        <span class="material-icons">event_note</span>
+                        <span>날짜와 시간을 선택하면 예약 가능한 회의실이 표시됩니다.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 알림 모달 -->
+        <div id="alertModal" class="modal" style="display: none">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="alertTitle">알림</h2>
+                    <span class="close-alert">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <p id="alertMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button id="alertConfirm" class="action-btn edit">확인</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- JS CDN은 body 맨 아래에 위치 -->
+        <script src="https://cdn.jsdelivr.net/npm/air-datepicker@3.5.3/air-datepicker.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script th:inline="javascript">
+            // proxyPath 가져오기
+            const proxyPath = /*[[${proxyPath}]]*/ "";
+            const frontProxyPath = /*[[${frontProxyPath}]]*/ "";
+
+            // 한글 로케일 직접 설정
+            const airDatepickerLocaleKo = {
+                days: ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"],
+                daysShort: ["일", "월", "화", "수", "목", "금", "토"],
+                daysMin: ["일", "월", "화", "수", "목", "금", "토"],
+                months: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+                monthsShort: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+                today: "오늘",
+                clear: "초기화",
+                dateFormat: "yyyy-MM-dd",
+                timeFormat: "hh:mm aa",
+                firstDay: 0,
+            };
+
+            // 전역 함수 - 변경 이벤트 트리거
+            function triggerChangeEvent(element) {
+                const event = new Event("change", { bubbles: true });
+                element.dispatchEvent(event);
+            }
+
+            // 알림 모달 초기화 함수
+            function initializeAlertModal() {
+                const modal = document.getElementById("alertModal");
+                const closeBtn = document.querySelector(".close-alert");
+                const confirmBtn = document.getElementById("alertConfirm");
+
+                // 모달 닫기 함수
+                function closeModal() {
+                    modal.classList.remove("show");
+                }
+
+                // 닫기 버튼 클릭 시 모달 닫기
+                if (closeBtn) {
+                    closeBtn.addEventListener("click", closeModal);
+                }
+
+                // 확인 버튼 클릭 시 모달 닫기
+                if (confirmBtn) {
+                    confirmBtn.addEventListener("click", closeModal);
+                }
+
+                // 모달 바깥 영역 클릭 시 모달 닫기
+                window.addEventListener("click", function (event) {
+                    if (event.target === modal) {
+                        closeModal();
+                    }
+                });
+            }
+
+            // 알림 모달 표시 함수
+            function showAlert(message, title = "알림", isSuccess = true) {
+                const modal = document.getElementById("alertModal");
+                const titleElem = document.getElementById("alertTitle");
+                const messageElem = document.getElementById("alertMessage");
+                const confirmBtn = document.getElementById("alertConfirm");
+
+                if (titleElem) titleElem.textContent = title;
+                if (messageElem) messageElem.textContent = message;
+
+                if (confirmBtn) {
+                    confirmBtn.className = isSuccess ? "action-btn success" : "action-btn edit";
+                }
+
+                if (modal) {
+                    modal.classList.add("show");
+                } else {
+                    // 모달이 없는 경우 기본 alert 사용
+                    alert(message);
+                }
+            }
+
+            document.addEventListener("DOMContentLoaded", function () {
+                const dateInputElem = document.getElementById("date");
+                const startTimeInputElem = document.getElementById("startTime");
+                const endTimeInputElem = document.getElementById("endTime");
+                const attendeesInputElem = document.getElementById("attendees");
+                const roomSelectElem = document.getElementById("roomId");
+                const headerElem = document.getElementById("header");
+
+                // 알림 모달 요소 초기화
+                initializeAlertModal();
+
+                // URL 파라미터에서 오류 메시지 확인
+                const urlParams = new URLSearchParams(window.location.search);
+                const error = urlParams.get("error");
+
+                // 오류 메시지 표시
+                if (error) {
+                    showAlert(decodeURIComponent(error), "오류", false);
+                }
+
+                // 스크롤 이벤트 핸들러 - 헤더 효과 추가
+                window.addEventListener("scroll", function () {
+                    if (window.scrollY > 10) {
+                        headerElem.classList.add("header-scrolled");
+                    } else {
+                        headerElem.classList.remove("header-scrolled");
+                    }
+                });
+
+                // 시간 드롭다운 초기화
+                setupTimeDropdowns();
+
+                // 날짜 선택기 초기화
+                setupDatepicker();
+
+                // 기존 예약 정보가 있을 경우 시간 드롭다운 초기화
+                initializeEditFormValues();
+
+                // 시작 시간, 종료 시간, 날짜 또는 인원수가 변경되면 가용 회의실 목록 갱신
+                function updateAvailableRooms() {
+                    const date = dateInputElem.value;
+                    const startTime = startTimeInputElem.value;
+                    const endTime = endTimeInputElem.value;
+                    // 참석자 그대로 사용 (빈 문자열도 그대로 전송)
+                    const attendees = attendeesInputElem.value.trim();
+
+                    console.log("문제 디버깅 - 인원 정보:", {
+                        원본값: attendeesInputElem.value,
+                        trim후: attendeesInputElem.value.trim(),
+                        최종값: attendees,
+                        값타입: typeof attendees,
+                        콤마수: attendees ? (attendees.match(/,/g) || []).length + 1 : 0,
+                        공백포함여부: attendees ? attendees.includes(" ") : false,
+                        URL인코딩: encodeURIComponent(attendees),
+                        이메일목록: attendees
+                            ? attendees
+                                  .split(",")
+                                  .map((e) => e.trim())
+                                  .filter((e) => e)
+                            : [],
+                    });
+
+                    console.log("Checking available rooms:", { date, startTime, endTime, attendees });
+
+                    // 세 가지 필수 요소가 모두 입력되었는지 검증
+                    if (!date || !startTime || !endTime) {
+                        console.log("모든 필수 입력 사항이 채워지지 않았습니다.");
+                        // 회의실 선택 필드 초기화 상태로 설정
+                        roomSelectElem.innerHTML =
+                            '<option value="" selected disabled>날짜와 시간을 먼저 선택해주세요</option>';
+
+                        // 회의실 블록을 모두 기본 상태로 표시
+                        const roomBlocks = document.querySelectorAll(".room-block");
+                        roomBlocks.forEach((block) => {
+                            block.style.opacity = "1.0";
+                            block.style.border = "1px solid #eee";
+                        });
+                        return;
+                    }
+
+                    // 필수 정보가 모두 입력된 경우에만 API 호출
+                    // 현재 선택된 회의실 ID 저장
+                    const currentSelectedRoomId = roomSelectElem.value;
+
+                    // 로딩 표시 추가
+                    roomSelectElem.disabled = true;
+                    const loadingOption = document.createElement("option");
+                    loadingOption.text = "회의실 목록을 불러오는 중...";
+                    roomSelectElem.innerHTML = "";
+                    roomSelectElem.appendChild(loadingOption);
+
+                    // API 호출하여 가용 회의실 목록 가져오기
+                    const apiUrl = `${frontProxyPath}/api/rooms/available?date=${date}&startTime=${startTime}&endTime=${endTime}&attendees=${attendees}`;
+                    console.log("API 요청 URL:", apiUrl);
+
+                    fetch(apiUrl, {
+                        credentials: "include",
+                    })
+                        .then((response) => {
+                            if (!response.ok) {
+                                throw new Error("회의실 정보를 불러오는데 실패했습니다.");
+                            }
+                            return response.json();
+                        })
+                        .then((availableRooms) => {
+                            console.log("Available rooms:", availableRooms);
+
+                            // 회의실 드롭다운 목록 초기화
+                            roomSelectElem.innerHTML = "";
+                            roomSelectElem.disabled = false;
+
+                            // 가용 회의실이 없는 경우 안내 메시지 추가
+                            if (availableRooms.length === 0) {
+                                const option = document.createElement("option");
+                                option.value = "";
+                                option.text = "해당 시간에 예약 가능한 회의실이 없습니다";
+                                option.disabled = true;
+                                option.selected = true;
+                                roomSelectElem.appendChild(option);
+                            } else {
+                                // 가용 회의실 목록 추가
+                                availableRooms.forEach((room) => {
+                                    const option = document.createElement("option");
+                                    option.value = room.roomId;
+                                    option.text = `${room.name} (${room.capacity}인실)`;
+                                    // 이전에 선택한 회의실이 여전히 가용하면 선택 상태 유지
+                                    if (room.roomId.toString() === currentSelectedRoomId) {
+                                        option.selected = true;
+                                    }
+                                    roomSelectElem.appendChild(option);
+                                });
+                            }
+
+                            // 회의실 블록 UI 업데이트
+                            updateRoomBlocks(availableRooms);
+                        })
+                        .catch((error) => {
+                            console.error("Error:", error);
+                            roomSelectElem.disabled = false;
+                            roomSelectElem.innerHTML = "<option>회의실 정보를 불러오지 못했습니다</option>";
+                        });
+                }
+
+                // 함수를 전역으로 사용할 수 있게 설정
+                window.updateAvailableRooms = updateAvailableRooms;
+
+                // 회의실 블록 UI 업데이트 (가용한 회의실만 강조 표시)
+                function updateRoomBlocks(availableRooms) {
+                    console.log("회의실 블록 UI 업데이트 시작");
+
+                    // 선택된 시간 슬롯 정보 저장
+                    const selectedStartInfo = selectedStartSlot
+                        ? {
+                              roomId: selectedStartSlot.dataset.roomId,
+                              startTime: selectedStartSlot.dataset.startTime,
+                              endTime: selectedStartSlot.dataset.endTime,
+                          }
+                        : null;
+
+                    const selectedEndInfo = selectedEndSlot
+                        ? {
+                              roomId: selectedEndSlot.dataset.roomId,
+                              startTime: selectedEndSlot.dataset.startTime,
+                              endTime: selectedEndSlot.dataset.endTime,
+                          }
+                        : null;
+
+                    console.log("저장된 선택 정보:", { 시작슬롯: selectedStartInfo, 종료슬롯: selectedEndInfo });
+
+                    // 회의실 블록 컨테이너 비우기
+                    const roomListContainer = document.getElementById("roomList");
+                    roomListContainer.innerHTML = "";
+
+                    if (availableRooms.length === 0) {
+                        // 가용 회의실이 없는 경우 메시지 표시
+                        const emptyMessage = document.createElement("div");
+                        emptyMessage.className = "empty-message";
+
+                        const icon = document.createElement("span");
+                        icon.className = "material-icons";
+                        icon.textContent = "event_busy";
+
+                        const text = document.createElement("span");
+                        text.textContent = "해당 시간에 예약 가능한 회의실이 없습니다.";
+
+                        emptyMessage.appendChild(icon);
+                        emptyMessage.appendChild(text);
+                        roomListContainer.appendChild(emptyMessage);
+
+                        // 가용 회의실이 없을 때만 선택 상태 초기화
+                        console.log("가용 회의실이 없어 선택 상태 초기화");
+                        selectedStartSlot = null;
+                        selectedEndSlot = null;
+                    } else {
+                        // 가용 회의실 블록 생성
+                        availableRooms.forEach((room) => {
+                            const roomBlock = document.createElement("div");
+                            roomBlock.className = "room-block";
+
+                            // 회의실 헤더
+                            const roomHeader = document.createElement("div");
+                            roomHeader.className = "room-header";
+
+                            const roomIcon = document.createElement("span");
+                            roomIcon.className = "material-icons room-icon";
+                            roomIcon.textContent = "meeting_room";
+
+                            const roomInfo = document.createElement("div");
+
+                            const roomName = document.createElement("div");
+                            roomName.className = "room-name";
+                            roomName.textContent = room.name;
+
+                            const capacityInfo = document.createElement("div");
+                            capacityInfo.className = "room-info";
+
+                            const personIcon = document.createElement("span");
+                            personIcon.className = "material-icons";
+                            personIcon.textContent = "people";
+
+                            const roomCapacity = document.createElement("span");
+                            roomCapacity.className = "room-capacity";
+                            roomCapacity.textContent = `최대 ${room.capacity}인`;
+
+                            capacityInfo.appendChild(personIcon);
+                            capacityInfo.appendChild(roomCapacity);
+
+                            roomInfo.appendChild(roomName);
+                            roomInfo.appendChild(capacityInfo);
+
+                            roomHeader.appendChild(roomIcon);
+                            roomHeader.appendChild(roomInfo);
+                            roomBlock.appendChild(roomHeader);
+
+                            // 시간 슬롯 정보
+                            if (room.timeSlots && room.timeSlots.length > 0) {
+                                console.log(`회의실 ${room.roomId}(${room.name})의 시간 슬롯 데이터:`, room.timeSlots);
+
+                                // 시간 슬롯을 분류
+                                const availableSlots = [];
+                                const unavailableSlots = [];
+
+                                // 새롭게 찾은 시작 종료 슬롯 저장
+                                let newStartSlot = null;
+                                let newEndSlot = null;
+
+                                // 선택된 슬롯의 위치 찾기 위한 변수
+                                const slotsMap = new Map();
+
+                                room.timeSlots.forEach((slot, index) => {
+                                    console.log(`슬롯 ${index + 1}:`, {
+                                        시작: slot.startTime,
+                                        종료: slot.endTime,
+                                        예약가능: slot.available,
+                                        데이터타입: typeof slot.available,
+                                    });
+
+                                    const slotElem = document.createElement("span");
+                                    slotElem.className = slot.available ? "slot available" : "slot unavailable";
+                                    slotElem.textContent = `${slot.startTime.substring(0, 5)}~${slot.endTime.substring(
+                                        0,
+                                        5
+                                    )}`;
+
+                                    // 시간 슬롯 데이터 저장
+                                    slotElem.dataset.startTime = slot.startTime;
+                                    slotElem.dataset.endTime = slot.endTime;
+                                    slotElem.dataset.roomId = room.roomId;
+                                    slotElem.dataset.isAvailable = slot.available ? "true" : "false";
+
+                                    // 슬롯 맵에 저장 (선택 상태 복원용)
+                                    slotsMap.set(`${slot.startTime}-${slot.endTime}`, slotElem);
+
+                                    // 선택된 슬롯과 일치하는지 확인
+                                    if (
+                                        selectedStartInfo &&
+                                        selectedStartInfo.roomId == room.roomId &&
+                                        selectedStartInfo.startTime === slot.startTime &&
+                                        selectedStartInfo.endTime === slot.endTime
+                                    ) {
+                                        newStartSlot = slotElem;
+                                    }
+
+                                    if (
+                                        selectedEndInfo &&
+                                        selectedEndInfo.roomId == room.roomId &&
+                                        selectedEndInfo.startTime === slot.startTime &&
+                                        selectedEndInfo.endTime === slot.endTime
+                                    ) {
+                                        newEndSlot = slotElem;
+                                    }
+
+                                    // 로그에 데이터 타입 확인용
+                                    console.log(`슬롯 ${slot.startTime}-${slot.endTime} 데이터 설정:`, {
+                                        원본isAvailable: slot.available,
+                                        원본타입: typeof slot.available,
+                                        변환후isAvailable: slotElem.dataset.isAvailable,
+                                        변환후타입: typeof slotElem.dataset.isAvailable,
+                                    });
+
+                                    if (slot.available) {
+                                        availableSlots.push(slotElem);
+
+                                        // 클릭 이벤트 추가
+                                        slotElem.addEventListener("click", handleTimeSlotClick);
+                                    } else {
+                                        unavailableSlots.push(slotElem);
+                                    }
+                                });
+
+                                // 1. 예약 가능한 시간 섹션 (있을 경우에만)
+                                if (availableSlots.length > 0) {
+                                    const availableSlotInfo = document.createElement("div");
+                                    availableSlotInfo.className = "time-slot-container";
+
+                                    const availableSlotHeader = document.createElement("div");
+                                    availableSlotHeader.className = "time-slot-header";
+
+                                    const availableTimeIcon = document.createElement("span");
+                                    availableTimeIcon.className = "material-icons";
+                                    availableTimeIcon.textContent = "check_circle";
+
+                                    const availableSlotLabel = document.createElement("span");
+                                    availableSlotLabel.textContent = "예약 가능한 시간";
+
+                                    availableSlotHeader.appendChild(availableTimeIcon);
+                                    availableSlotHeader.appendChild(availableSlotLabel);
+                                    availableSlotInfo.appendChild(availableSlotHeader);
+
+                                    const availableSlotList = document.createElement("div");
+                                    availableSlotList.className = "slot-list";
+                                    // 가용 슬롯 추가
+                                    availableSlots.forEach((slot) => availableSlotList.appendChild(slot));
+
+                                    availableSlotInfo.appendChild(availableSlotList);
+                                    roomBlock.appendChild(availableSlotInfo);
+                                }
+
+                                // 2. 예약 불가능한 시간 섹션 (있을 경우에만)
+                                if (unavailableSlots.length > 0) {
+                                    const unavailableSlotInfo = document.createElement("div");
+                                    unavailableSlotInfo.className = "time-slot-container";
+
+                                    const unavailableSlotHeader = document.createElement("div");
+                                    unavailableSlotHeader.className = "time-slot-header";
+
+                                    const unavailableTimeIcon = document.createElement("span");
+                                    unavailableTimeIcon.className = "material-icons";
+                                    unavailableTimeIcon.textContent = "block";
+
+                                    const unavailableSlotLabel = document.createElement("span");
+                                    unavailableSlotLabel.textContent = "예약 불가능한 시간";
+
+                                    unavailableSlotHeader.appendChild(unavailableTimeIcon);
+                                    unavailableSlotHeader.appendChild(unavailableSlotLabel);
+                                    unavailableSlotInfo.appendChild(unavailableSlotHeader);
+
+                                    const unavailableSlotList = document.createElement("div");
+                                    unavailableSlotList.className = "slot-list";
+
+                                    // 불가용 슬롯 추가
+                                    unavailableSlots.forEach((slot) => unavailableSlotList.appendChild(slot));
+
+                                    unavailableSlotInfo.appendChild(unavailableSlotList);
+                                    roomBlock.appendChild(unavailableSlotInfo);
+                                }
+
+                                // 선택 상태 복원
+                                if (newStartSlot && newEndSlot) {
+                                    // 새 DOM 요소로 선택 상태 갱신
+                                    selectedStartSlot = newStartSlot;
+                                    selectedEndSlot = newEndSlot;
+
+                                    // 선택 클래스 추가
+                                    newStartSlot.classList.add("selected");
+                                    newEndSlot.classList.add("selected");
+
+                                    // 범위 내 슬롯 하이라이팅
+                                    highlightTimeRange(newStartSlot, newEndSlot);
+                                } else if (newStartSlot) {
+                                    // 시작만 선택된 경우
+                                    selectedStartSlot = newStartSlot;
+                                    selectedEndSlot = null;
+                                    newStartSlot.classList.add("selected");
+                                } else {
+                                    // 선택 상태를 찾지 못했으면 초기화
+                                    selectedStartSlot = null;
+                                    selectedEndSlot = null;
+                                }
+                            }
+
+                            roomListContainer.appendChild(roomBlock);
+                        });
+                    }
+                }
+
+                // 전역 변수로 시간 선택 상태 관리
+                let selectedStartSlot = null;
+                let selectedEndSlot = null;
+
+                // 시간 슬롯 클릭 핸들러
+                function handleTimeSlotClick(event) {
+                    console.log("슬롯 클릭 이벤트 시작 ==============================");
+                    const clickedSlot = event.target;
+
+                    // 클릭된 슬롯 정보 출력
+                    console.log("클릭된 슬롯 정보:", {
+                        시작시간: clickedSlot.dataset.startTime,
+                        종료시간: clickedSlot.dataset.endTime,
+                        회의실ID: clickedSlot.dataset.roomId,
+                        예약가능: clickedSlot.dataset.isAvailable,
+                        데이터타입: typeof clickedSlot.dataset.isAvailable,
+                    });
+
+                    const allSlots = document.querySelectorAll(".slot.available");
+
+                    // 첫 번째 슬롯 선택 (아직 선택된 슬롯이 없는 경우)
+                    if (!selectedStartSlot) {
+                        console.log("첫 번째 슬롯 선택");
+                        selectedStartSlot = clickedSlot;
+                        clickedSlot.classList.add("selected");
+
+                        // 드롭다운 값 설정 (시작 시간)
+                        const startTime = clickedSlot.dataset.startTime;
+                        const [startHour, startMinute] = startTime.split(":");
+
+                        document.getElementById("startHourSelected").textContent = startHour;
+                        document.getElementById("startMinuteSelected").textContent = startMinute;
+                        document.getElementById("startTime").value = startTime;
+
+                        // 종료 시간도 함께 설정 (해당 슬롯의 종료 시간으로)
+                        const endTime = clickedSlot.dataset.endTime;
+                        const [endHour, endMinute] = endTime.split(":");
+
+                        document.getElementById("endHourSelected").textContent = endHour;
+                        document.getElementById("endMinuteSelected").textContent = endMinute;
+                        document.getElementById("endTime").value = endTime;
+
+                        console.log(`시작 시간: ${startTime}, 종료 시간: ${endTime} 자동 설정됨`);
+
+                        // 회의실 ID도 설정
+                        document.getElementById("roomId").value = clickedSlot.dataset.roomId;
+
+                        // API 호출 제거: triggerChangeEvent(document.getElementById("startTime"));
+
+                        showAlert("선택한 시간 범위 내에 예약할 수 없는 시간이 포함되어 있습니다.", "예약 불가", false);
+                        return;
+                    }
+
+                    // 이미 선택된 첫 번째 슬롯을 다시 클릭한 경우
+                    if (selectedStartSlot === clickedSlot) {
+                        // 선택 해제
+                        resetTimeSlotSelection();
+                        return;
+                    }
+
+                    // 두 번째 슬롯 선택 (시작 슬롯은 이미 선택된 경우)
+                    const startTime = new Date(`2000-01-01T${selectedStartSlot.dataset.startTime}`);
+                    const endTime = new Date(`2000-01-01T${clickedSlot.dataset.endTime}`);
+
+                    // 종료 시간이 시작 시간보다 이전인 경우, 리셋 후 첫 번째 선택으로 간주
+                    if (endTime <= startTime) {
+                        resetTimeSlotSelection();
+                        selectedStartSlot = clickedSlot;
+                        clickedSlot.classList.add("selected");
+
+                        const newStartTime = clickedSlot.dataset.startTime;
+                        const [startHour, startMinute] = newStartTime.split(":");
+
+                        document.getElementById("startHourSelected").textContent = startHour;
+                        document.getElementById("startMinuteSelected").textContent = startMinute;
+                        document.getElementById("startTime").value = newStartTime;
+
+                        // 종료 시간도 함께 설정
+                        const newEndTime = clickedSlot.dataset.endTime;
+                        const [endHour, endMinute] = newEndTime.split(":");
+
+                        document.getElementById("endHourSelected").textContent = endHour;
+                        document.getElementById("endMinuteSelected").textContent = endMinute;
+                        document.getElementById("endTime").value = newEndTime;
+
+                        // 회의실 ID도 설정
+                        document.getElementById("roomId").value = clickedSlot.dataset.roomId;
+
+                        // API 호출 제거: triggerChangeEvent(document.getElementById("startTime"));
+
+                        showAlert("선택한 시간 범위 내에 예약할 수 없는 시간이 포함되어 있습니다.", "예약 불가", false);
+                        return;
+                    }
+
+                    // 시작과 종료 사이의 모든 슬롯이 예약 가능한지 확인
+                    const isRangeValid = checkTimeRange(selectedStartSlot, clickedSlot);
+
+                    if (!isRangeValid) {
+                        // 연속적이지 않은 범위가 선택된 경우 리셋 후 새로운 시작 슬롯으로 설정
+                        resetTimeSlotSelection();
+                        selectedStartSlot = clickedSlot;
+                        clickedSlot.classList.add("selected");
+
+                        const newStartTime = clickedSlot.dataset.startTime;
+                        const [startHour, startMinute] = newStartTime.split(":");
+
+                        document.getElementById("startHourSelected").textContent = startHour;
+                        document.getElementById("startMinuteSelected").textContent = startMinute;
+                        document.getElementById("startTime").value = newStartTime;
+
+                        // 종료 시간도 함께 설정
+                        const newEndTime = clickedSlot.dataset.endTime;
+                        const [endHour, endMinute] = newEndTime.split(":");
+
+                        document.getElementById("endHourSelected").textContent = endHour;
+                        document.getElementById("endMinuteSelected").textContent = endMinute;
+                        document.getElementById("endTime").value = newEndTime;
+
+                        // 회의실 ID도 설정
+                        document.getElementById("roomId").value = clickedSlot.dataset.roomId;
+
+                        // API 호출 제거: triggerChangeEvent(document.getElementById("startTime"));
+
+                        showAlert("선택한 시간 범위 내에 예약할 수 없는 시간이 포함되어 있습니다.", "예약 불가", false);
+                        return;
+                    }
+
+                    // 유효한 범위 선택 완료
+                    selectedEndSlot = clickedSlot;
+                    clickedSlot.classList.add("selected");
+
+                    // 시작과 종료 사이의 모든 슬롯에 클래스 추가
+                    highlightTimeRange(selectedStartSlot, selectedEndSlot);
+
+                    // 시작 시간과 종료 시간 설정
+                    const finalStartTime = selectedStartSlot.dataset.startTime;
+                    const finalEndTime = selectedEndSlot.dataset.endTime;
+
+                    // 드롭다운 값 설정
+                    const [startHour, startMinute] = finalStartTime.split(":");
+                    const [endHour, endMinute] = finalEndTime.split(":");
+
+                    document.getElementById("startHourSelected").textContent = startHour;
+                    document.getElementById("startMinuteSelected").textContent = startMinute;
+                    document.getElementById("startTime").value = finalStartTime;
+
+                    document.getElementById("endHourSelected").textContent = endHour;
+                    document.getElementById("endMinuteSelected").textContent = endMinute;
+                    document.getElementById("endTime").value = finalEndTime;
+
+                    // API 호출 트리거 제거
+                    // triggerChangeEvent(document.getElementById("startTime"));
+                    // triggerChangeEvent(document.getElementById("endTime"));
+
+                    // 선택된 회의실 설정
+                    const roomId = selectedStartSlot.dataset.roomId;
+                    document.getElementById("roomId").value = roomId;
+                }
+
+                // 시작과 종료 사이의 모든 슬롯이 예약 가능한지 확인하는 함수
+                function checkTimeRange(startSlot, endSlot) {
+                    console.log("시간 범위 검증 시작 ==============================");
+                    console.log("시작 슬롯:", {
+                        시작시간: startSlot.dataset.startTime,
+                        종료시간: startSlot.dataset.endTime,
+                        회의실ID: startSlot.dataset.roomId,
+                        예약가능: startSlot.dataset.isAvailable,
+                    });
+
+                    console.log("종료 슬롯:", {
+                        시작시간: endSlot.dataset.startTime,
+                        종료시간: endSlot.dataset.endTime,
+                        회의실ID: endSlot.dataset.roomId,
+                        예약가능: endSlot.dataset.isAvailable,
+                    });
+
+                    // 같은 회의실인지 확인
+                    if (startSlot.dataset.roomId !== endSlot.dataset.roomId) {
+                        console.log("다른 회의실이 선택되었습니다!");
+                        return false;
+                    }
+
+                    const roomId = startSlot.dataset.roomId;
+                    const startTime = new Date(`2000-01-01T${startSlot.dataset.startTime}`);
+                    const endTime = new Date(`2000-01-01T${endSlot.dataset.endTime}`);
+
+                    console.log("선택 시간 범위:", {
+                        시작: startTime.toLocaleTimeString(),
+                        종료: endTime.toLocaleTimeString(),
+                    });
+
+                    // 같은 회의실의 모든 시간 슬롯 수집
+                    const allSlots = Array.from(document.querySelectorAll(`.slot[data-room-id="${roomId}"]`));
+                    console.log(`회의실 ${roomId}의 총 슬롯 수: ${allSlots.length}`);
+
+                    // 시간순으로 정렬
+                    allSlots.sort((a, b) => {
+                        const timeA = new Date(`2000-01-01T${a.dataset.startTime}`);
+                        const timeB = new Date(`2000-01-01T${b.dataset.startTime}`);
+                        return timeA - timeB;
+                    });
+
+                    // 시작과 종료 사이의 슬롯 필터링
+                    const slotsInRange = allSlots.filter((slot) => {
+                        const slotStart = new Date(`2000-01-01T${slot.dataset.startTime}`);
+                        return slotStart >= startTime && slotStart < endTime;
+                    });
+
+                    console.log(`선택 범위 내 슬롯 수: ${slotsInRange.length}`);
+
+                    // 범위 내 슬롯들의 상세 정보 출력
+                    slotsInRange.forEach((slot, index) => {
+                        console.log(`슬롯 ${index + 1}:`, {
+                            시작: slot.dataset.startTime,
+                            종료: slot.dataset.endTime,
+                            예약가능: slot.dataset.isAvailable,
+                            데이터타입: typeof slot.dataset.isAvailable,
+                        });
+                    });
+
+                    // 모든 슬롯이 예약 가능한지 확인
+                    const isAllAvailable = slotsInRange.every((slot) => {
+                        // dataset.isAvailable이 "true" 문자열인지 확인
+                        // 또는 available 클래스가 있는지 확인 (이중 체크)
+                        const isSlotAvailable =
+                            slot.dataset.isAvailable === "true" || slot.classList.contains("available");
+                        console.log(`슬롯 ${slot.dataset.startTime}-${slot.dataset.endTime} 검증:`, {
+                            isAvailable값: slot.dataset.isAvailable,
+                            데이터타입: typeof slot.dataset.isAvailable,
+                            classList: slot.className,
+                            비교결과: isSlotAvailable,
+                        });
+                        return isSlotAvailable;
+                    });
+
+                    console.log("모든 슬롯 예약 가능 여부:", isAllAvailable);
+                    console.log("시간 범위 검증 종료 ==============================");
+
+                    return isAllAvailable;
+                }
+
+                // 시간 범위 강조 표시 함수
+                function highlightTimeRange(startSlot, endSlot) {
+                    const roomId = startSlot.dataset.roomId;
+                    const startTime = new Date(`2000-01-01T${startSlot.dataset.startTime}`);
+                    const endTime = new Date(`2000-01-01T${endSlot.dataset.endTime}`);
+
+                    // 같은 회의실의 모든 시간 슬롯 수집
+                    const allSlots = Array.from(document.querySelectorAll(`.slot[data-room-id="${roomId}"]`));
+
+                    // 시간 범위 내의 슬롯 강조
+                    allSlots.forEach((slot) => {
+                        const slotStart = new Date(`2000-01-01T${slot.dataset.startTime}`);
+                        const slotEnd = new Date(`2000-01-01T${slot.dataset.endTime}`);
+
+                        if (slotStart >= startTime && slotEnd <= endTime) {
+                            if (slot !== startSlot && slot !== endSlot) {
+                                slot.classList.add("in-range");
+                            }
+                        }
+                    });
+                }
+
+                // 시간 슬롯 선택 초기화 함수
+                function resetTimeSlotSelection() {
+                    // 선택된 슬롯에서 클래스 제거
+                    document.querySelectorAll(".slot.selected, .slot.in-range").forEach((slot) => {
+                        slot.classList.remove("selected", "in-range");
+                    });
+
+                    // 전역 변수 초기화
+                    selectedStartSlot = null;
+                    selectedEndSlot = null;
+                }
+
+                // 함수를 전역으로 사용할 수 있게 설정 - 함수 정의 후에 할당
+                window.resetTimeSlotSelection = resetTimeSlotSelection;
+
+                // API 호출 디바운스 함수 관련 변수
+                let apiCallTimeout;
+
+                // 페이지 로드 시 수정 모드 감지
+                const isMeetingEditMode = document.getElementById("meetingId") !== null;
+                console.log("수정 모드 확인:", isMeetingEditMode ? "수정 모드" : "신규 예약 모드");
+
+                function triggerInputChange() {
+                    clearTimeout(apiCallTimeout);
+                    apiCallTimeout = setTimeout(() => {
+                        // 수정 모드에서는 무조건 API 호출하도록 단순화
+                        if (isMeetingEditMode) {
+                            console.log("수정 모드: 입력 변경 감지 - 항상 API 호출 실행");
+                            updateAvailableRooms();
+                            return;
+                        }
+
+                        // 신규 예약 모드
+                        console.log("신규 예약 모드: API 호출 실행");
+                        updateAvailableRooms();
+                    }, 300);
+                }
+
+                // 이벤트 리스너 등록
+                dateInputElem.addEventListener("change", function () {
+                    triggerInputChange();
+                    window.resetTimeSlotSelection(); // 날짜 변경 시에는 초기화
+                });
+                startTimeInputElem.addEventListener("change", triggerInputChange);
+                endTimeInputElem.addEventListener("change", triggerInputChange);
+                attendeesInputElem.addEventListener("change", triggerInputChange);
+
+                // 페이지 로드 시 초기화
+                // 회의실 선택 필드 초기화 상태로 설정 (수정 모드가 아닌 경우에만)
+                if (!isMeetingEditMode) {
+                    roomSelectElem.innerHTML =
+                        '<option value="" selected disabled>날짜와 시간을 먼저 선택해주세요</option>';
+
+                    // 회의실 목록도 초기 안내 메시지로 설정
+                    const roomListContainer = document.getElementById("roomList");
+                    if (roomListContainer) {
+                        roomListContainer.innerHTML = `
+                            <div class="empty-message">
+                                <span class="material-icons">event_note</span>
+                                <span>날짜와 시간을 선택하면 예약 가능한 회의실이 표시됩니다.</span>
+                            </div>
+                        `;
+                    }
+                }
+
+                // 초기 로딩 후에는 updateAvailableRooms 호출은 하지 않음
+                // 사용자가 직접 시간을 입력해야 목록이 갱신됨
+            });
+
+            // 시간 드롭다운 설정 함수
+            function setupTimeDropdowns() {
+                // 시간과 분 드롭다운 관련 요소
+                const startHourSelected = document.getElementById("startHourSelected");
+                const startMinuteSelected = document.getElementById("startMinuteSelected");
+                const endHourSelected = document.getElementById("endHourSelected");
+                const endMinuteSelected = document.getElementById("endMinuteSelected");
+
+                const startHourList = document.getElementById("startHourList");
+                const startMinuteList = document.getElementById("startMinuteList");
+                const endHourList = document.getElementById("endHourList");
+                const endMinuteList = document.getElementById("endMinuteList");
+
+                const startTimeInput = document.getElementById("startTime");
+                const endTimeInput = document.getElementById("endTime");
+
+                // 시간 옵션 (9시~22시)
+                const hours = [];
+                for (let i = 9; i <= 22; i++) {
+                    hours.push(i < 10 ? `0${i}` : `${i}`);
+                }
+
+                // 분 옵션 (00, 30분)
+                const minutes = ["00", "30"];
+
+                // 드롭다운 초기값 설정 제거 (빈 값으로 시작)
+                startHourSelected.textContent = "--";
+                startMinuteSelected.textContent = "--";
+                endHourSelected.textContent = "--";
+                endMinuteSelected.textContent = "--";
+
+                // 히든 인풋 초기값 설정 제거
+                startTimeInput.value = "";
+                endTimeInput.value = "";
+
+                // 종료 시간 관련 요소들 비활성화 (시작 시간 선택 전까지)
+                const endTimeSelectors = document.querySelectorAll(".end-time-dropdown");
+                endTimeSelectors.forEach((elem) => {
+                    elem.classList.add("disabled");
+                });
+
+                // 시작 시간 (시간) 드롭다운 옵션 생성
+                hours.forEach((hour) => {
+                    const option = document.createElement("div");
+                    option.className = "dropdown-option";
+                    option.textContent = hour;
+                    option.onclick = function () {
+                        // 오늘 날짜가 선택된 경우 현재 시간보다 이후만 선택 가능하도록 제한
+                        const dateInput = document.getElementById("date");
+                        const selectedDate = dateInput.value;
+                        const today = new Date().toISOString().split("T")[0];
+
+                        if (selectedDate === today) {
+                            const now = new Date();
+                            const currentHour = now.getHours();
+                            const currentMinute = now.getMinutes();
+                            const selectedHour = parseInt(hour);
+                            const selectedMinute = parseInt(
+                                startMinuteSelected.textContent === "--" ? "0" : startMinuteSelected.textContent
+                            );
+
+                            // 현재 시간보다 이전 시간을 선택한 경우
+                            if (
+                                selectedHour < currentHour ||
+                                (selectedHour === currentHour && selectedMinute <= currentMinute)
+                            ) {
+                                alert("현재 시각보다 이후 시간만 선택 가능합니다.");
+                                return;
+                            }
+                        }
+
+                        startHourSelected.textContent = hour;
+                        startTimeInput.value = `${hour}:${
+                            startMinuteSelected.textContent === "--" ? "00" : startMinuteSelected.textContent
+                        }`;
+                        toggleDropdown(startHourList, false);
+
+                        // 시작 시간이 선택되었을 때 종료 시간 선택 활성화
+                        if (startMinuteSelected.textContent !== "--") {
+                            enableEndTimeSelection();
+                        }
+
+                        updateEndTimeOptions();
+                        triggerChangeEvent(startTimeInput);
+
+                        // 시간 선택 시 해당 슬롯 찾기 및 선택
+                        synchronizeTimeSlotSelection();
+                    };
+                    startHourList.appendChild(option);
+                });
+
+                // 시작 시간 (분) 드롭다운 옵션 생성
+                minutes.forEach((minute) => {
+                    const option = document.createElement("div");
+                    option.className = "dropdown-option";
+                    option.textContent = minute;
+                    option.onclick = function () {
+                        // 오늘 날짜가 선택된 경우 현재 시간보다 이후만 선택 가능하도록 제한
+                        const dateInput = document.getElementById("date");
+                        const selectedDate = dateInput.value;
+                        const today = new Date().toISOString().split("T")[0];
+
+                        if (selectedDate === today && startHourSelected.textContent !== "--") {
+                            const now = new Date();
+                            const currentHour = now.getHours();
+                            const currentMinute = now.getMinutes();
+                            const selectedHour = parseInt(startHourSelected.textContent);
+                            const selectedMinute = parseInt(minute);
+
+                            // 현재 시간보다 이전 시간을 선택한 경우
+                            if (
+                                selectedHour < currentHour ||
+                                (selectedHour === currentHour && selectedMinute <= currentMinute)
+                            ) {
+                                alert("현재 시각보다 이후 시간만 선택 가능합니다.");
+                                return;
+                            }
+                        }
+
+                        startMinuteSelected.textContent = minute;
+                        startTimeInput.value = `${
+                            startHourSelected.textContent === "--" ? "09" : startHourSelected.textContent
+                        }:${minute}`;
+                        toggleDropdown(startMinuteList, false);
+
+                        // 시작 시간이 선택되었을 때 종료 시간 선택 활성화
+                        if (startHourSelected.textContent !== "--") {
+                            enableEndTimeSelection();
+                        }
+
+                        updateEndTimeOptions();
+                        triggerChangeEvent(startTimeInput);
+
+                        // 시간 선택 시 해당 슬롯 찾기 및 선택
+                        synchronizeTimeSlotSelection();
+                    };
+                    startMinuteList.appendChild(option);
+                });
+
+                // 종료 시간 선택을 활성화하는 함수
+                function enableEndTimeSelection() {
+                    const endTimeSelectors = document.querySelectorAll(".end-time-dropdown");
+                    endTimeSelectors.forEach((elem) => {
+                        elem.classList.remove("disabled");
+                    });
+                }
+
+                // 종료 시간 (시간) 드롭다운 옵션 생성
+                hours.forEach((hour) => {
+                    const option = document.createElement("div");
+                    option.className = "dropdown-option";
+                    option.textContent = hour;
+                    option.onclick = function () {
+                        // 시작 시간이 선택되지 않았다면 선택 불가
+                        if (startTimeInput.value === "") {
+                            alert("시작 시간을 먼저 선택해주세요.");
+                            return;
+                        }
+
+                        // 시작 시간보다 이전 시간을 선택한 경우
+                        const startHour = parseInt(startHourSelected.textContent);
+                        const selectedHour = parseInt(hour);
+                        const startMinute = parseInt(startMinuteSelected.textContent);
+                        const endMinute = parseInt(
+                            endMinuteSelected.textContent === "--" ? "0" : endMinuteSelected.textContent
+                        );
+
+                        if (selectedHour < startHour || (selectedHour === startHour && endMinute <= startMinute)) {
+                            // 종료 시간이 시작 시간 이후로 자동 조정
+                            if (startMinute === 30) {
+                                endHourSelected.textContent =
+                                    startHour + 1 < 10 ? `0${startHour + 1}` : `${startHour + 1}`;
+                                endMinuteSelected.textContent = "00";
+                            } else {
+                                endHourSelected.textContent = startHourSelected.textContent;
+                                endMinuteSelected.textContent = "30";
+                            }
+
+                            endTimeInput.value = `${endHourSelected.textContent}:${endMinuteSelected.textContent}`;
+                            alert("종료 시간은 시작 시간보다 이후여야 합니다.");
+                            return;
+                        }
+
+                        endHourSelected.textContent = hour;
+                        endTimeInput.value = `${hour}:${
+                            endMinuteSelected.textContent === "--" ? "00" : endMinuteSelected.textContent
+                        }`;
+                        toggleDropdown(endHourList, false);
+                        triggerChangeEvent(endTimeInput);
+
+                        // 시간 선택 시 해당 슬롯 찾기 및 선택
+                        synchronizeTimeSlotSelection();
+                    };
+                    endHourList.appendChild(option);
+                });
+
+                // 종료 시간 (분) 드롭다운 옵션 생성
+                minutes.forEach((minute) => {
+                    const option = document.createElement("div");
+                    option.className = "dropdown-option";
+                    option.textContent = minute;
+                    option.onclick = function () {
+                        // 시작 시간이 선택되지 않았다면 선택 불가
+                        if (startTimeInput.value === "") {
+                            alert("시작 시간을 먼저 선택해주세요.");
+                            return;
+                        }
+
+                        // 시작 시간보다 이전 시간을 선택한 경우
+                        const startHour = parseInt(startHourSelected.textContent);
+                        const endHour = parseInt(
+                            endHourSelected.textContent === "--" ? "0" : endHourSelected.textContent
+                        );
+                        const startMinute = parseInt(startMinuteSelected.textContent);
+                        const selectedMinute = parseInt(minute);
+
+                        if (endHour < startHour || (endHour === startHour && selectedMinute <= startMinute)) {
+                            // 종료 시간이 시작 시간 이후로 자동 조정
+                            if (startMinute === 30) {
+                                endHourSelected.textContent =
+                                    startHour + 1 < 10 ? `0${startHour + 1}` : `${startHour + 1}`;
+                                endMinuteSelected.textContent = "00";
+                            } else {
+                                endHourSelected.textContent = startHourSelected.textContent;
+                                endMinuteSelected.textContent = "30";
+                            }
+
+                            endTimeInput.value = `${endHourSelected.textContent}:${endMinuteSelected.textContent}`;
+                            alert("종료 시간은 시작 시간보다 이후여야 합니다.");
+                            return;
+                        }
+
+                        endMinuteSelected.textContent = minute;
+                        endTimeInput.value = `${
+                            endHourSelected.textContent === "--" ? "09" : endHourSelected.textContent
+                        }:${minute}`;
+                        toggleDropdown(endMinuteList, false);
+                        triggerChangeEvent(endTimeInput);
+
+                        // 시간 선택 시 해당 슬롯 찾기 및 선택
+                        synchronizeTimeSlotSelection();
+                    };
+                    endMinuteList.appendChild(option);
+                });
+
+                // 드롭다운 열기/닫기 설정
+                startHourSelected.addEventListener("click", function () {
+                    toggleDropdown(startHourList);
+                });
+
+                startMinuteSelected.addEventListener("click", function () {
+                    toggleDropdown(startMinuteList);
+                });
+
+                endHourSelected.addEventListener("click", function () {
+                    // 시작 시간이 선택되지 않았다면 클릭 불가
+                    if (startTimeInput.value === "") {
+                        alert("시작 시간을 먼저 선택해주세요.");
+                        return;
+                    }
+                    toggleDropdown(endHourList);
+                });
+
+                endMinuteSelected.addEventListener("click", function () {
+                    // 시작 시간이 선택되지 않았다면 클릭 불가
+                    if (startTimeInput.value === "") {
+                        alert("시작 시간을 먼저 선택해주세요.");
+                        return;
+                    }
+                    toggleDropdown(endMinuteList);
+                });
+
+                // 드롭다운 외부 클릭 시 모든 드롭다운 닫기
+                document.addEventListener("click", function (event) {
+                    if (!event.target.closest(".custom-dropdown")) {
+                        closeAllDropdowns();
+                    }
+                });
+
+                // 드롭다운에서 시간이 변경되었을 때 타임슬롯 선택과 동기화하는 함수
+                function synchronizeTimeSlotSelection() {
+                    console.log("동기화 함수 호출됨 - 드롭다운에서 시간 변경");
+
+                    // 기존 선택 초기화
+                    document.querySelectorAll(".slot.selected, .slot.in-range").forEach((slot) => {
+                        slot.classList.remove("selected", "in-range");
+                    });
+
+                    // 전역 변수 초기화
+                    window.selectedStartSlot = null;
+                    window.selectedEndSlot = null;
+
+                    // 현재 선택된 시간 가져오기
+                    const startTime = startTimeInput.value;
+                    const endTime = endTimeInput.value;
+                    const selectedRoomId = document.getElementById("roomId").value;
+
+                    console.log("선택된 시간:", { startTime, endTime, selectedRoomId });
+
+                    if (!startTime || !endTime) {
+                        console.log("시간이 선택되지 않아 동기화 중단");
+                        return;
+                    }
+
+                    // 모든 가용 슬롯 가져오기
+                    const allAvailableSlots = document.querySelectorAll(".slot.available");
+                    console.log(`가용 슬롯 개수: ${allAvailableSlots.length}`);
+
+                    let foundStartSlot = null;
+                    let foundEndSlot = null;
+
+                    // 선택된 회의실이 있는 경우
+                    if (selectedRoomId) {
+                        console.log(`회의실 ID ${selectedRoomId}로 슬롯 검색 중...`);
+                        const roomSlots = Array.from(
+                            document.querySelectorAll(`.slot.available[data-room-id="${selectedRoomId}"]`)
+                        );
+
+                        // 시간 순으로 정렬
+                        roomSlots.sort((a, b) => {
+                            return a.dataset.startTime.localeCompare(b.dataset.startTime);
+                        });
+
+                        console.log(`회의실 ${selectedRoomId}의 슬롯 수: ${roomSlots.length}`);
+
+                        // 슬롯 검색
+                        for (const slot of roomSlots) {
+                            console.log(`슬롯 확인: ${slot.dataset.startTime} ~ ${slot.dataset.endTime}`);
+
+                            // 시작 시간이 일치하는 슬롯 찾기
+                            if (slot.dataset.startTime === startTime) {
+                                foundStartSlot = slot;
+                                console.log(`시작 슬롯 찾음: ${startTime}`);
+                            }
+
+                            // 종료 시간이 일치하는 슬롯 찾기
+                            if (slot.dataset.endTime === endTime) {
+                                foundEndSlot = slot;
+                                console.log(`종료 슬롯 찾음: ${endTime}`);
+                            }
+                        }
+                    } else {
+                        // 선택된 회의실이 없는 경우
+                        console.log("선택된 회의실이 없어 모든 슬롯에서 검색");
+
+                        // 시작 시간과 일치하는 첫 번째 슬롯 찾기
+                        for (const slot of allAvailableSlots) {
+                            if (slot.dataset.startTime === startTime) {
+                                foundStartSlot = slot;
+                                // 회의실 자동 선택
+                                document.getElementById("roomId").value = slot.dataset.roomId;
+                                console.log(`시작 슬롯 찾음: ${startTime}, 회의실 ID: ${slot.dataset.roomId}`);
+                                break;
+                            }
+                        }
+
+                        // 시작 슬롯이 선택된 경우, 같은 회의실의 종료 슬롯 찾기
+                        if (foundStartSlot) {
+                            const roomId = foundStartSlot.dataset.roomId;
+                            const roomSlots = Array.from(
+                                document.querySelectorAll(`.slot.available[data-room-id="${roomId}"]`)
+                            );
+
+                            for (const slot of roomSlots) {
+                                if (slot.dataset.endTime === endTime) {
+                                    foundEndSlot = slot;
+                                    console.log(`종료 슬롯 찾음: ${endTime}`);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    // 시작 슬롯만 찾은 경우
+                    if (foundStartSlot && !foundEndSlot) {
+                        console.log("시작 슬롯만 선택됨");
+                        window.selectedStartSlot = foundStartSlot;
+                        foundStartSlot.classList.add("selected");
+
+                        // 시작 슬롯의 종료 시간과 일치하는 종료 시간 설정
+                        const newEndTime = foundStartSlot.dataset.endTime;
+                        const [endHour, endMinute] = newEndTime.split(":");
+
+                        // 종료 시간 UI 업데이트 (트리거 없이)
+                        document.getElementById("endHourSelected").textContent = endHour;
+                        document.getElementById("endMinuteSelected").textContent = endMinute;
+                        document.getElementById("endTime").value = newEndTime;
+
+                        console.log(`종료 시간 자동 설정: ${newEndTime}`);
+                    }
+                    // 시작과 종료 슬롯 모두 찾은 경우
+                    else if (foundStartSlot && foundEndSlot) {
+                        console.log("시작과 종료 슬롯 모두 선택됨");
+                        window.selectedStartSlot = foundStartSlot;
+                        window.selectedEndSlot = foundEndSlot;
+
+                        foundStartSlot.classList.add("selected");
+                        foundEndSlot.classList.add("selected");
+
+                        // 시간 범위 하이라이트
+                        highlightTimeRange(foundStartSlot, foundEndSlot);
+                    } else {
+                        console.log("일치하는 슬롯을 찾지 못함");
+                    }
+                }
+
+                // 종료 시간 옵션 업데이트 (시작 시간보다 이후로만 선택 가능)
+                function updateEndTimeOptions() {
+                    // 시작 시간이 선택되지 않은 경우 처리 안함
+                    if (startHourSelected.textContent === "--" || startMinuteSelected.textContent === "--") {
+                        return;
+                    }
+
+                    const startHour = parseInt(startHourSelected.textContent);
+                    const startMinute = parseInt(startMinuteSelected.textContent);
+
+                    // 종료 시간이 선택되지 않은 경우 자동 설정
+                    if (endHourSelected.textContent === "--" || endMinuteSelected.textContent === "--") {
+                        // 30분 단위로 자동 설정
+                        if (startMinute === 30) {
+                            endHourSelected.textContent = startHour + 1 < 10 ? `0${startHour + 1}` : `${startHour + 1}`;
+                            endMinuteSelected.textContent = "00";
+                        } else {
+                            endHourSelected.textContent = startHourSelected.textContent;
+                            endMinuteSelected.textContent = "30";
+                        }
+
+                        endTimeInput.value = `${endHourSelected.textContent}:${endMinuteSelected.textContent}`;
+                        return;
+                    }
+
+                    // 종료 시간이 시작 시간보다 이전이면 종료 시간 자동 조정
+                    let endHour = parseInt(endHourSelected.textContent);
+                    let endMinute = parseInt(endMinuteSelected.textContent);
+
+                    if (endHour < startHour || (endHour === startHour && endMinute <= startMinute)) {
+                        // 시작 시간이 22:30이면 종료 시간은 23:00으로 설정
+                        if (startHour === 22 && startMinute === 30) {
+                            endHourSelected.textContent = "23";
+                            endMinuteSelected.textContent = "00";
+                        } else if (startMinute === 30) {
+                            // 30분이면 다음 시간의 00분으로 설정
+                            endHourSelected.textContent = startHour + 1 < 10 ? `0${startHour + 1}` : `${startHour + 1}`;
+                            endMinuteSelected.textContent = "00";
+                        } else {
+                            // 00분이면 같은 시간의 30분으로 설정
+                            endHourSelected.textContent = startHourSelected.textContent;
+                            endMinuteSelected.textContent = "30";
+                        }
+
+                        endTimeInput.value = `${endHourSelected.textContent}:${endMinuteSelected.textContent}`;
+                        triggerChangeEvent(endTimeInput);
+                    }
+                }
+
+                // 드롭다운 토글 함수
+                function toggleDropdown(dropdownList, toggle = true) {
+                    // 모든 드롭다운 먼저 닫기
+                    closeAllDropdowns();
+
+                    // 지정된 드롭다운만 토글
+                    if (toggle) {
+                        dropdownList.style.display = dropdownList.style.display === "block" ? "none" : "block";
+                    } else {
+                        dropdownList.style.display = "none";
+                    }
+                }
+
+                // 모든 드롭다운 닫기
+                function closeAllDropdowns() {
+                    const allDropdownLists = document.querySelectorAll(".dropdown-list");
+                    allDropdownLists.forEach((list) => {
+                        list.style.display = "none";
+                    });
+                }
+            }
+
+            // 날짜 선택기 설정 함수
+            function setupDatepicker() {
+                const dateInputElem = document.getElementById("date");
+
+                // Air Datepicker 초기화
+                new AirDatepicker("#date", {
+                    navTitles: {
+                        days: "yyyy, MMMM",
+                        months: "yyyy",
+                    },
+                    inline: false,
+                    dateFormat: "yyyy-MM-dd",
+                    minDate: new Date(),
+                    autoClose: true,
+                    locale: airDatepickerLocaleKo,
+                    buttons: [
+                        {
+                            content: "오늘",
+                            onClick: (dp) => {
+                                const today = new Date();
+                                dp.selectDate(today);
+                                dp.setViewDate(today);
+                            },
+                        },
+                        {
+                            content: "초기화",
+                            onClick: (dp) => {
+                                dp.clear();
+
+                                // 날짜가 초기화되면 시간 선택도 초기화
+                                const startHourSelected = document.getElementById("startHourSelected");
+                                const startMinuteSelected = document.getElementById("startMinuteSelected");
+                                const endHourSelected = document.getElementById("endHourSelected");
+                                const endMinuteSelected = document.getElementById("endMinuteSelected");
+
+                                startHourSelected.textContent = "--";
+                                startMinuteSelected.textContent = "--";
+                                endHourSelected.textContent = "--";
+                                endMinuteSelected.textContent = "--";
+
+                                document.getElementById("startTime").value = "";
+                                document.getElementById("endTime").value = "";
+
+                                // 종료 시간 관련 요소들 비활성화
+                                const endTimeSelectors = document.querySelectorAll(".end-time-dropdown");
+                                endTimeSelectors.forEach((elem) => {
+                                    elem.classList.add("disabled");
+                                });
+
+                                // 기존 선택된 슬롯 초기화
+                                window.resetTimeSlotSelection();
+
+                                // 회의실 목록 초기화
+                                window.updateAvailableRooms();
+                            },
+                        },
+                    ],
+                    onSelect({ date }) {
+                        // 날짜 선택 이벤트 발생 시 변경 이벤트 트리거
+                        if (date) {
+                            // 오늘 날짜 선택 시 현재 시간과 비교
+                            const selectedDate = dateInputElem.value;
+                            const today = new Date().toISOString().split("T")[0];
+
+                            if (selectedDate === today) {
+                                // 현재 시간 이전의 시간 선택을 조정하기 위해 시간 선택 초기화
+                                const startHourSelected = document.getElementById("startHourSelected");
+                                const startMinuteSelected = document.getElementById("startMinuteSelected");
+                                const endHourSelected = document.getElementById("endHourSelected");
+                                const endMinuteSelected = document.getElementById("endMinuteSelected");
+
+                                const now = new Date();
+                                const currentHour = now.getHours();
+                                const currentMinute = now.getMinutes();
+
+                                // 현재 시간 이후로만 시작 시간을 설정할 수 있도록 함
+                                if (startHourSelected.textContent !== "--") {
+                                    const selectedHour = parseInt(startHourSelected.textContent);
+                                    const selectedMinute = parseInt(
+                                        startMinuteSelected.textContent === "--" ? "0" : startMinuteSelected.textContent
+                                    );
+
+                                    if (
+                                        selectedHour < currentHour ||
+                                        (selectedHour === currentHour && selectedMinute <= currentMinute)
+                                    ) {
+                                        startHourSelected.textContent = "--";
+                                        startMinuteSelected.textContent = "--";
+                                        document.getElementById("startTime").value = "";
+
+                                        // 시작 시간이 초기화되면 종료 시간도 초기화
+                                        endHourSelected.textContent = "--";
+                                        endMinuteSelected.textContent = "--";
+                                        document.getElementById("endTime").value = "";
+
+                                        // 종료 시간 비활성화
+                                        const endTimeSelectors = document.querySelectorAll(".end-time-dropdown");
+                                        endTimeSelectors.forEach((elem) => {
+                                            elem.classList.add("disabled");
+                                        });
+                                    }
+                                }
+                            }
+
+                            triggerChangeEvent(dateInputElem);
+                        }
+                    },
+                });
+            }
+
+            // 전역 함수 - 기존 예약 정보로 폼 초기화
+            function initializeEditFormValues() {
+                // 시작 시간 값이 있는지 확인
+                const startTimeValue = document.getElementById("startTime").value;
+                const endTimeValue = document.getElementById("endTime").value;
+
+                // Thymeleaf로 형식화된 시간 값 확인 (이 값이 우선 사용됨)
+                const formattedStartTime = document.getElementById("formattedStartTime")
+                    ? document.getElementById("formattedStartTime").value
+                    : null;
+                const formattedEndTime = document.getElementById("formattedEndTime")
+                    ? document.getElementById("formattedEndTime").value
+                    : null;
+
+                // 디버깅 - input 요소와 실제 값 출력
+                console.log("시간 초기화 디버깅:");
+                console.log("startTime input 값:", startTimeValue);
+                console.log("endTime input 값:", endTimeValue);
+                console.log("Thymeleaf 형식화된 시간값 - startTime:", formattedStartTime);
+                console.log("Thymeleaf 형식화된 시간값 - endTime:", formattedEndTime);
+
+                // 서버에서 전달된 값 출력 - 템플릿에 디버그 코드 출력
+                console.log("서버에서 전달된 meeting 객체:", {
+                    startTime: document.getElementById("hiddenStartTimeDebug")
+                        ? document.getElementById("hiddenStartTimeDebug").value
+                        : "디버그 요소 없음",
+                    endTime: document.getElementById("hiddenEndTimeDebug")
+                        ? document.getElementById("hiddenEndTimeDebug").value
+                        : "디버그 요소 없음",
+                });
+
+                // 우선적으로 형식화된 시간을 사용하고, 없는 경우 기존 값 사용
+                const finalStartTime = formattedStartTime || startTimeValue;
+                const finalEndTime = formattedEndTime || endTimeValue;
+
+                if (finalStartTime || finalEndTime) {
+                    console.log("시간 초기화 정보:", { 시작시간: finalStartTime, 종료시간: finalEndTime });
+
+                    // 시간 파싱
+                    let startHour, startMinute, endHour, endMinute;
+
+                    // 시작 시간 파싱
+                    if (finalStartTime && finalStartTime.includes(":")) {
+                        [startHour, startMinute] = finalStartTime.split(":");
+                    } else {
+                        // ":" 구분자가 없는 경우 기본값 설정
+                        startHour = "--";
+                        startMinute = "--";
+                    }
+
+                    // 종료 시간 파싱
+                    if (finalEndTime && finalEndTime.includes(":")) {
+                        [endHour, endMinute] = finalEndTime.split(":");
+                    } else {
+                        // ":" 구분자가 없는 경우 기본값 설정
+                        endHour = "--";
+                        endMinute = "--";
+                    }
+
+                    console.log("파싱된 시간 정보:", {
+                        시작시: startHour,
+                        시작분: startMinute,
+                        종료시: endHour,
+                        종료분: endMinute,
+                    });
+
+                    // 시작 시간 설정
+                    document.getElementById("startHourSelected").textContent = startHour;
+                    document.getElementById("startMinuteSelected").textContent = startMinute;
+
+                    // 종료 시간 설정
+                    document.getElementById("endHourSelected").textContent = endHour;
+                    document.getElementById("endMinuteSelected").textContent = endMinute;
+
+                    // 종료 시간 드롭다운 활성화
+                    const endTimeSelectors = document.querySelectorAll(".end-time-dropdown");
+                    endTimeSelectors.forEach((elem) => {
+                        elem.classList.remove("disabled");
+                    });
+
+                    // 기존 히든 인풋에 형식화된 시간 설정
+                    if (formattedStartTime) {
+                        document.getElementById("startTime").value = formattedStartTime;
+                    }
+
+                    if (formattedEndTime) {
+                        document.getElementById("endTime").value = formattedEndTime;
+                    }
+
+                    // 수정 모드인 경우 처리
+                    if (document.getElementById("meetingId")) {
+                        console.log("수정 모드: 페이지 로드 완료 - 입력 변경 시 항상 API 호출됨");
+
+                        // 수정 모드에서는 가용 회의실 목록을 API로 호출하지 않고
+                        // 기존 회의실 선택 상태만 유지 (사용자가 날짜/시간/참석자를 변경할 때만 API 호출)
+
+                        // 회의실 선택 드롭다운에서 선택된 항목이 있는지 확인
+                        const roomIdSelect = document.getElementById("roomId");
+                        if (roomIdSelect && roomIdSelect.value) {
+                            console.log("수정 모드: 기존 선택된 회의실 ID: " + roomIdSelect.value);
+
+                            // 회의실 목록 컨테이너 업데이트 - 기존 회의실 정보만 표시
+                            const roomListContainer = document.getElementById("roomList");
+                            if (roomListContainer) {
+                                // 선택된 옵션 요소 찾기
+                                const selectedOption = Array.from(roomIdSelect.options).find(
+                                    (option) => option.selected
+                                );
+                                if (selectedOption) {
+                                    const roomName = selectedOption.text; // "회의실명 (N인실)" 형식
+
+                                    // 기존 회의실 정보만 표시
+                                    roomListContainer.innerHTML = `
+                                        <div class="room-block" style="opacity: 1;">
+                                            <div class="room-header">
+                                                <span class="material-icons room-icon">meeting_room</span>
+                                                <div>
+                                                    <div class="room-name">현재 예약된 회의실</div>
+                                                    <div class="room-info">
+                                                        <span class="material-icons">info</span>
+                                                        <span>${roomName}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="time-slot-container">
+                                                <div class="time-slot-header">
+                                                    <span class="material-icons">info</span>
+                                                    <span>날짜, 시간, 참석자 정보를 변경하면 가용 회의실 목록이 업데이트됩니다.</span>
+                                                </div>
+                                            </div>
+                                        </div>`;
+                                }
+                            }
+                        }
+
+                        // 시간 선택으로 슬롯 동기화는 하지 않음 (API 호출 없이)
+                        // synchronizeTimeSlotSelection();
+                    }
+                } else {
+                    console.log("시간 값이 없어 초기화를 건너뜀");
+                }
+            }
+
+            // 함수를 전역으로 사용할 수 있게 설정
+            window.initializeEditFormValues = initializeEditFormValues;
+
+            // 이메일 형식 검증 함수
+            function validateEmail(email) {
+                const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+                return emailRegex.test(email);
+            }
+
+            // 폼 제출 전 참석자 이메일 검증
+            document.querySelector("form").addEventListener("submit", function (event) {
+                const attendeesInput = document.getElementById("attendees");
+                const emails = attendeesInput.value.split(",").map((email) => email.trim());
+
+                // 이메일이 입력되었는지 확인
+                if (emails.length === 0 || (emails.length === 1 && emails[0] === "")) {
+                    event.preventDefault();
+                    showAlert("참석자 이메일을 입력해주세요.", "입력 오류", false);
+                    return;
+                }
+
+                // 각 이메일 형식 검증
+                let invalidEmails = [];
+                emails.forEach((email) => {
+                    if (!validateEmail(email)) {
+                        invalidEmails.push(email);
+                    }
+                });
+
+                if (invalidEmails.length > 0) {
+                    event.preventDefault();
+                    showAlert(`다음 이메일 형식이 올바르지 않습니다: ${invalidEmails.join(", ")}`, "입력 오류", false);
+                }
+            });
+        </script>
+    </body>
+</html>
