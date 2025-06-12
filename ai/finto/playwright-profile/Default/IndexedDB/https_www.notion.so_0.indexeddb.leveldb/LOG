@@ -1,0 +1,20 @@
+2025/05/31-20:43:07.850 52596b Creating DB /Users/seokwanwoo/Desktop/agent-chat-ui-main/finto/playwright-profile/Default/IndexedDB/https_www.notion.so_0.indexeddb.leveldb since it was missing.
+2025/05/31-20:43:07.855 52596b Reusing MANIFEST /Users/seokwanwoo/Desktop/agent-chat-ui-main/finto/playwright-profile/Default/IndexedDB/https_www.notion.so_0.indexeddb.leveldb/MANIFEST-000001
+2025/05/31-20:43:08.232 525969 Level-0 table #5: started
+2025/05/31-20:43:08.237 525969 Level-0 table #5: 2641 bytes OK
+2025/05/31-20:43:08.248 525969 Delete type=0 #3
+2025/05/31-20:43:08.250 525969 Manual compaction at level-0 from '\x00\x01\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x02\x00\x00\x00' @ 0 : 0; will stop at (end)
+2025/05/31-20:44:54.191 525969 Level-0 table #7: started
+2025/05/31-20:44:54.203 525969 Level-0 table #7: 545 bytes OK
+2025/05/31-20:44:54.225 525969 Delete type=0 #4
+2025/05/31-20:44:54.226 525969 Manual compaction at level-0 from '\x00\x03\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x04\x00\x00\x00' @ 0 : 0; will stop at (end)
+2025/05/31-20:45:13.205 525978 Level-0 table #9: started
+2025/05/31-20:45:13.209 525978 Level-0 table #9: 547 bytes OK
+2025/05/31-20:45:13.218 525978 Delete type=0 #6
+2025/05/31-20:45:13.219 525969 Manual compaction at level-0 from '\x00\x04\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x05\x00\x00\x00' @ 0 : 0; will stop at '\x00\x04\x00\x00\x05' @ 220 : 1
+2025/05/31-20:45:13.220 525969 Compacting 1@0 + 1@1 files
+2025/05/31-20:45:13.222 525969 Generated table #10@0: 13 keys, 516 bytes
+2025/05/31-20:45:13.222 525969 Compacted 1@0 + 1@1 files => 516 bytes
+2025/05/31-20:45:13.224 525969 compacted to: files[ 0 1 1 0 0 0 0 ]
+2025/05/31-20:45:13.225 525969 Delete type=2 #9
+2025/05/31-20:45:13.226 525969 Manual compaction at level-0 from '\x00\x04\x00\x00\x05' @ 220 : 1 .. '\x00\x05\x00\x00\x00' @ 0 : 0; will stop at (end)

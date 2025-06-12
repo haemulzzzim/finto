@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "google-calendar": {
+      "command": "node",
+      "args": [
+        "/Users/james_kyh/Downloads/agent-chat-ui-main 11/finto/src/react_agent/google-calendar-mcp/build/index.js"
+      ],
+      "transport": "stdio"
+    },
+    "playwright": {
+      "command": "node",
+      "args": [
+        "/Users/james_kyh/Downloads/agent-chat-ui-main 11/finto/src/react_agent/playwright-mcp/cli.js",
+        "--cdp-endpoint",
+        "http://localhost:9222",
+        "--caps",
+        "core,tabs,history,wait,files"
+      ],
+      "transport": "stdio"
+    }
+  }
+}

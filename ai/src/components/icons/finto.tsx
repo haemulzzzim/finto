@@ -1,0 +1,65 @@
+export function FintoLogoSVG({
+  className,
+  width,
+  height,
+}: {
+  width?: number;
+  height?: number;
+  className?: string;
+}) {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 40 40"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      {/* 4개의 곡선 요소들 */}
+      <path
+        d="M 10 10 Q 15 5 20 10 Q 25 15 30 10"
+        fill="#4A90E2"
+        opacity="0.7"
+      />
+      <path
+        d="M 30 10 Q 35 15 30 20 Q 25 25 30 30"
+        fill="#4A90E2"
+        opacity="0.7"
+      />
+      <path
+        d="M 30 30 Q 25 35 20 30 Q 15 25 10 30"
+        fill="#4A90E2"
+        opacity="0.7"
+      />
+      <path
+        d="M 10 30 Q 5 25 10 20 Q 15 15 10 10"
+        fill="#4A90E2"
+        opacity="0.7"
+      />
+      
+      {/* 중앙 원 배경 */}
+      <circle
+        cx="20"
+        cy="20"
+        r="8"
+        fill="white"
+        stroke="#4A90E2"
+        strokeWidth="1"
+      />
+      
+      {/* F 글자 */}
+      <text
+        x="20"
+        y="25"
+        textAnchor="middle"
+        fill="#4A90E2"
+        fontSize="12"
+        fontWeight="bold"
+        fontFamily="Arial, sans-serif"
+      >
+        F
+      </text>
+    </svg>
+  );
+} 

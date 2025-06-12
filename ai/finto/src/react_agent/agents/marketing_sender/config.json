@@ -1,0 +1,33 @@
+{
+  "mcpServers": {
+    "slack": {
+      "command": "node",
+      "args": [
+        "/Users/james_kyh/Downloads/agent-chat-ui-main 11/finto/src/react_agent/slack-mcp-server/src/slack/dist/index.js"
+      ],
+      "env": {
+        "SLACK_BOT_TOKEN": "xoxp-8942961248023-8942961254711-8973162503073-40dff207185b5ada0030a2788fe6a2af",
+        "SLACK_TEAM_ID": "T08TQU97A0P",
+        "SLACK_CHANNEL_IDS": "C08TQU9QN3H, C08TXJ1614K"
+      },
+      "transport": "stdio"
+    },
+    "gmail": {
+      "command": "node",
+      "args": [
+        "/Users/james_kyh/Downloads/agent-chat-ui-main 11/finto/src/react_agent/gmail-mcp-server/dist/index.js"
+      ],
+      "transport": "stdio"
+    },
+    "word-document-server": {
+      "command": "/Users/james_kyh/Downloads/agent-chat-ui-main 11/finto/src/react_agent/Office-Word-MCP-Server/.venv/bin/python",
+      "args": [
+        "/Users/james_kyh/Downloads/agent-chat-ui-main 11/finto/src/react_agent/Office-Word-MCP-Server/word_mcp_server.py"
+      ],
+      "env": {
+        "PYTHONPATH": "/Users/james_kyh/Downloads/agent-chat-ui-main 11/finto/src/react_agent/Office-Word-MCP-Server"
+      },
+      "transport": "stdio"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "notionApi": {
+      "command": "node",
+      "args": [
+        "/Users/james_kyh/Downloads/agent-chat-ui-main 11/finto/src/react_agent/notion-mcp-server/bin/cli.mjs"
+      ],
+      "env": {
+        "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer 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\", \"Notion-Version\": \"2022-06-28\" }"
+      },
+      "transport": "stdio"
+    },
+    "word-document-server": {
+      "command": "/Users/james_kyh/Downloads/agent-chat-ui-main 11/finto/src/react_agent/Office-Word-MCP-Server/.venv/bin/python",
+      "args": [
+        "/Users/james_kyh/Downloads/agent-chat-ui-main 11/finto/src/react_agent/Office-Word-MCP-Server/word_mcp_server.py"
+      ],
+      "env": {
+        "PYTHONPATH": "/Users/james_kyh/Downloads/agent-chat-ui-main 11/finto/src/react_agent/Office-Word-MCP-Server"
+      },
+      "transport": "stdio"
+    }
+  }
+}

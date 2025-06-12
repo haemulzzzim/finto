@@ -1,0 +1,33 @@
+{
+  "mcpServers": {
+    "legal-qdrant-server": {
+      "command": "uvx",
+      "args": ["mcp-server-qdrant", "--transport", "stdio"],
+      "env": {
+        "QDRANT_URL": "http://100.66.119.25:6333/",
+        "COLLECTION_NAME": "legal_documents",
+        "EMBEDDING_MODEL": "intfloat/multilingual-e5-large",
+        "VECTOR_NAME": "fast-multilingual-e5-large",
+        "DOCUMENT_FIELD": "document",
+        "TOOL_STORE_DESCRIPTION": "법률 문서를 저장합니다. 상품설명서, 법령조항, 금융법규 등의 문서를 저장할 때 사용하세요. 메타데이터에 'article_no', 'chapter_no', 'item_no' 등 법령 관련 정보를 포함하면 더 효과적으로 검색할 수 있습니다.",
+        "TOOL_FIND_DESCRIPTION": "법률 정보와 금융 규제를 검색합니다. 상품설명서의 법적 오류를 찾거나, 특정 법령조항을 검색할 때 사용하세요. 검색 예시: '외화예금 수수료 면제 조건', '은행법 제18조', '금융소비자보호법 위반 사례'",
+        "USE_RERANKING": "true",
+        "RERANKING_METHOD": "hybrid",
+        "USE_LLM_RESTRUCTURE": "auto",
+        "TOP_K": "5",
+        "INITIAL_K": "20"
+      },
+      "transport": "stdio"
+    },
+    "word-document-server": {
+      "command": "/Users/james_kyh/Downloads/agent-chat-ui-main 11/finto/src/react_agent/Office-Word-MCP-Server/.venv/bin/python",
+      "args": [
+        "/Users/james_kyh/Downloads/agent-chat-ui-main 11/finto/src/react_agent/Office-Word-MCP-Server/word_mcp_server.py"
+      ],
+      "env": {
+        "PYTHONPATH": "/Users/james_kyh/Downloads/agent-chat-ui-main 11/finto/src/react_agent/Office-Word-MCP-Server"
+      },
+      "transport": "stdio"
+    }
+  }
+}
